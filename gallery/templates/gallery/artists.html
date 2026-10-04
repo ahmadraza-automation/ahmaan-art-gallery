@@ -1,0 +1,22 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block structured_data %}<script type="application/ld+json">{{ breadcrumb_jsonld|safe }}</script>{% endblock %}
+{% block content %}
+<section class="content-page artists-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="{% url 'gallery:home' %}">Home</a><span aria-hidden="true">/</span><span aria-current="page">Our Artists</span></nav>
+  <p class="eyebrow">The hands and minds behind the work</p>
+  <h1>Our Artists</h1>
+  <p class="lede">Meet the independent artists whose work makes this collection.</p>
+  {% include "ads/slot.html" with ad_slot=ad_slot %}
+  <div class="artist-list-grid">
+    {% for artist in artists %}
+    <article class="artist-list-item">
+      <a class="artist-list-image" href="{% url 'gallery:artist_detail' artist.slug %}" aria-label="View {{ artist.name }}’s profile">
+        {% if artist.photo %}<img src="{{ artist.photo.url }}" alt="Portrait of {{ artist.name }}" loading="lazy">{% else %}<span class="artist-profile-fallback" aria-hidden="true"></span>{% endif %}
+      </a>
+      <div class="artist-list-copy"><p class="eyebrow">{{ artist.specialty|default:'Independent artist' }}{% if artist.city %} · {{ artist.city }}{% endif %}</p><h2><a href="{% url 'gallery:artist_detail' artist.slug %}">{{ artist.name }}</a></h2><p>{{ artist.bio|truncatewords:28 }}</p><div class="artist-list-links"><span>{{ artist.work_count }} artwork{{ artist.work_count|pluralize }}</span><a href="{% url 'gallery:artist_detail' artist.slug %}">View profile <span aria-hidden="true">↗</span></a>{% if artist.interview_article and artist.interview_article.is_published %}<a href="{% url 'core:journal_detail' artist.interview_article.slug %}">Interview <span aria-hidden="true">↗</span></a>{% endif %}</div></div>
+    </article>
+    {% empty %}<p class="content-note">Artist profiles are being prepared.</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

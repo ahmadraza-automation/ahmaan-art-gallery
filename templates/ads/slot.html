@@ -1,0 +1,3 @@
+{% if adsense_enabled and ad_slot and ad_slot.is_active %}
+<div class="ad-slot" data-adsense-slot data-ad-client="{{ adsense_client_id }}" data-ad-slot="{{ ad_slot.slot_id }}" aria-label="Advertisement" hidden></div>
+{% endif %}

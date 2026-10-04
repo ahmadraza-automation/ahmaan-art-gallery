@@ -1,0 +1,18 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="profile-page">
+  <div class="profile-heading"><p class="eyebrow"><span class="eyebrow-dot"></span> Your gallery account</p><h1>Your profile.</h1></div>
+  {% if messages %}{% for message in messages %}<p class="success-message">{{ message }}</p>{% endfor %}{% endif %}
+  <div class="profile-layout">
+    <form class="contact-form profile-form" method="post">
+      {% csrf_token %}<h2>Personal details</h2>
+      {% for field in form %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>{% endfor %}
+      <button class="button-link" type="submit">Save profile <span aria-hidden="true">↗</span></button>
+    </form>
+    <section class="order-history"><p class="eyebrow">Your purchases</p><h2>Order history</h2>
+      {% if orders %}{% for order in orders %}<article class="history-order"><div><strong>{{ order.requested_title|default:order.get_art_category_display }}</strong><span>{{ order.created_at|date:'M j, Y' }} · {{ order.get_status_display }}</span></div><strong>{{ order.get_size_display }} · {{ order.quantity }} item{{ order.quantity|pluralize }}</strong></article>{% endfor %}{% else %}<p class="panel-hint">Your order history will appear here.</p>{% endif %}
+    </section>
+  </div>
+</section>
+{% endblock %}

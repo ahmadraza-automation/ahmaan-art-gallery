@@ -1,0 +1,47 @@
+{% load static %}
+{% if discovery_rooms %}
+<section class="room-discovery-section" aria-labelledby="room-discovery-title">
+  <div class="editorial-section-heading"><div><p class="eyebrow">Find a place for it</p><h2 id="room-discovery-title">Shop by Room</h2></div></div>
+  <div class="room-discovery-grid">{% for room in discovery_rooms %}
+    <article class="room-discovery-card">
+      <a class="room-discovery-image" href="{% url 'gallery:room_detail' room.slug %}" aria-label="Explore art for your {{ room.name }}">
+        {% if room.image %}<img src="{{ room.image.url }}" alt="Art for the {{ room.name|lower }}" loading="lazy">
+        {% elif room.slug == 'dining-room' %}<img src="{% static 'gallery/images/rooms/dining-room.svg' %}" alt="A dining room with a framed artwork and a table set for conversation" loading="lazy">
+        {% elif room.slug == 'living-room' %}<img src="{% static 'gallery/images/rooms/living-room.svg' %}" alt="A quiet living room with a sofa and original art" loading="lazy">
+        {% elif room.slug == 'kitchen' %}<img src="{% static 'gallery/images/rooms/kitchen.svg' %}" alt="A light-filled kitchen with framed artwork" loading="lazy">
+        {% elif room.slug == 'bedroom' %}<img src="{% static 'gallery/images/rooms/bedroom.svg' %}" alt="A restful bedroom with art above the bed" loading="lazy">
+        {% else %}<span class="room-image-placeholder room-image-placeholder--{{ room.slug }}" role="img" aria-label="{{ room.name }} interior illustration can be added in gallery admin"></span>{% endif %}
+      </a>
+      <div class="room-discovery-copy"><h3>{{ room.name }}</h3><p>{{ room.short_description }}</p><a class="room-outline-link" href="{% url 'gallery:room_detail' room.slug %}">Shop {{ room.name }} Art</a></div>
+    </article>
+  {% endfor %}</div>
+</section>
+{% endif %}
+
+{% if price_ranges %}
+<section class="price-discovery-section" aria-labelledby="price-discovery-title">
+  <div class="editorial-section-heading"><div><p class="eyebrow">A thoughtful place to begin</p><h2 id="price-discovery-title">Shop by Price</h2></div></div>
+  <nav class="price-range-list" aria-label="Shop artworks by price range">{% for price_range in price_ranges %}<a class="price-range-link" href="{% url 'gallery:shop' %}?min_price={{ price_range.minimum_price|floatformat:0 }}{% if price_range.maximum_price is not None %}&amp;max_price={{ price_range.maximum_price|floatformat:0 }}{% endif %}">{{ price_range.label }} <span aria-hidden="true">↗</span></a>{% endfor %}</nav>
+</section>
+{% endif %}
+
+{% if curator_collections %}
+<section class="discovery-carousel-section" aria-label="Curator favorites" data-discovery-carousel>
+  <div class="editorial-section-heading"><div><p class="eyebrow">A considered point of view</p><h2>Curator Favorites</h2></div><a class="editorial-text-link" href="{% url 'gallery:collections' %}">All collections <span aria-hidden="true">↗</span></a></div>
+  <div class="discovery-scroll-track" data-discovery-track>{% for collection in curator_collections %}
+    <a class="curator-favorite-card discovery-scroll-card" href="{% url 'gallery:collection_detail' collection.slug %}">
+      {% if collection.cover_image %}<img src="{{ collection.cover_image.url }}" alt="" loading="lazy">{% else %}<span class="curator-favorite-fallback curator-favorite-fallback--{{ forloop.counter }}" aria-hidden="true"></span>{% endif %}
+      <span class="curator-favorite-copy"><small>Collection {{ forloop.counter|stringformat:'02d' }}</small><strong>{{ collection.name }}</strong><span>{{ collection.short_description }}</span></span><span class="curator-favorite-arrow" aria-hidden="true">↗</span>
+    </a>
+  {% endfor %}</div>
+  <div class="discovery-carousel-controls"><button type="button" data-discovery-prev aria-label="Previous curator favorites">←</button><button type="button" data-discovery-next aria-label="Next curator favorites">→</button></div>
+</section>
+{% endif %}
+
+{% if new_this_week %}
+<section class="discovery-carousel-section new-this-week-section" aria-label="New this week" data-discovery-carousel>
+  <div class="editorial-section-heading"><div><p class="eyebrow">Fresh from the studio</p><h2>New This Week</h2></div><a class="editorial-text-link" href="{% url 'gallery:new_arrivals' %}">See all new arrivals <span aria-hidden="true">↗</span></a></div>
+  <div class="discovery-product-track" data-discovery-track>{% for artwork in new_this_week %}<div class="discovery-scroll-card">{% include 'gallery/partials/_discovery_product_card.html' %}</div>{% endfor %}</div>
+  <div class="discovery-carousel-controls"><button type="button" data-discovery-prev aria-label="Previous new arrivals">←</button><button type="button" data-discovery-next aria-label="Next new arrivals">→</button></div>
+</section>
+{% endif %}

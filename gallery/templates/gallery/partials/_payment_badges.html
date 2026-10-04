@@ -1,0 +1,6 @@
+<div class="payment-methods" aria-label="Payment methods information">
+  {% if not site_settings or site_settings.payment_badge_cod %}<span>Cash on delivery</span>{% endif %}
+  {% if site_settings and site_settings.payment_badge_bank_transfer %}{% if site_settings.bank_account_number or site_settings.bank_iban %}<span>Bank transfer</span>{% endif %}{% endif %}
+  {% if site_settings and site_settings.payment_badge_jazzcash and site_settings.jazzcash_number %}<span>JazzCash</span>{% endif %}
+  {% if site_settings and site_settings.payment_badge_easypaisa and site_settings.easypaisa_number %}<span>Easypaisa</span>{% endif %}
+</div>

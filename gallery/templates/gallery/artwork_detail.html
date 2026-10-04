@@ -1,0 +1,43 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block structured_data %}<script type="application/ld+json">{{ product_jsonld|safe }}</script><script type="application/ld+json">{{ breadcrumb_jsonld|safe }}</script>{% endblock %}
+{% block content %}
+<section class="detail-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="{% url 'gallery:home' %}">Home</a><span aria-hidden="true">/</span><a href="{% url 'gallery:shop' %}">Artworks</a><span aria-hidden="true">/</span><span aria-current="page">{{ artwork.title }}</span></nav>
+  <a class="back-link" href="{% url 'gallery:home' %}#collection"><span aria-hidden="true">←</span> Back to the collection</a>
+  <div class="detail-layout">
+    <div class="detail-image frame-preview frame-preview--none" data-frame-preview style="--art-image: url('{{ artwork.image_url }}')" role="img" aria-label="{{ artwork.title }} by {{ artwork.artist }}"></div>
+    <div class="detail-info">
+      <p class="eyebrow">{{ artwork.get_category_display }}{% if artwork.year %} &middot; {{ artwork.year }}{% endif %}</p>
+      <h1>{{ artwork.title }}</h1><p class="detail-artist">By {{ artwork.artist }}</p>
+      <div class="product-discovery-actions">
+        <form class="product-wishlist-form" method="post" action="{% url 'gallery:legacy_wishlist_toggle' artwork.pk %}" hx-post="{% url 'gallery:legacy_wishlist_toggle' artwork.pk %}" hx-swap="none" data-wishlist-form>{% csrf_token %}<button class="heart-button" type="submit" data-wishlist-toggle data-wishlist-kind="legacy" data-artwork-id="{{ artwork.pk }}" data-artwork-title="{{ artwork.title }}" aria-label="{% if artwork.pk in legacy_wishlist_ids %}Remove{% else %}Save{% endif %} {{ artwork.title }} {% if artwork.pk in legacy_wishlist_ids %}from{% else %}to{% endif %} wishlist" aria-pressed="{% if artwork.pk in legacy_wishlist_ids %}true{% else %}false{% endif %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.1-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.7A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.6Z"/></svg><span>Save</span></button></form>
+        <form class="product-compare-form" method="post" action="{% url 'gallery:legacy_compare_toggle' artwork.pk %}" hx-post="{% url 'gallery:legacy_compare_toggle' artwork.pk %}" hx-swap="none">{% csrf_token %}<button class="compare-toggle" type="submit" data-compare-toggle data-artwork-type="legacy" data-artwork-id="{{ artwork.pk }}" data-artwork-title="{{ artwork.title }}" aria-label="{% if artwork.pk in legacy_compare_ids %}Remove{% else %}Add{% endif %} {{ artwork.title }} {% if artwork.pk in legacy_compare_ids %}from{% else %}to{% endif %} compare" aria-pressed="{% if artwork.pk in legacy_compare_ids %}true{% else %}false{% endif %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Compare</span></button></form>
+      </div>
+      <div class="product-discovery-actions">
+        <form class="product-wishlist-form" method="post" action="{% url 'gallery:legacy_wishlist_toggle' artwork.pk %}" hx-post="{% url 'gallery:legacy_wishlist_toggle' artwork.pk %}" hx-swap="none" data-wishlist-form>{% csrf_token %}<button class="heart-button" type="submit" data-wishlist-toggle data-wishlist-kind="legacy" data-artwork-id="{{ artwork.pk }}" data-artwork-title="{{ artwork.title }}" aria-label="{% if artwork.pk in legacy_wishlist_ids %}Remove{% else %}Save{% endif %} {{ artwork.title }} {% if artwork.pk in legacy_wishlist_ids %}from{% else %}to{% endif %} wishlist" aria-pressed="{% if artwork.pk in legacy_wishlist_ids %}true{% else %}false{% endif %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.1-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.7A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.6Z"/></svg><span>Save</span></button></form>
+        <form class="product-compare-form" method="post" action="{% url 'gallery:legacy_compare_toggle' artwork.pk %}" hx-post="{% url 'gallery:legacy_compare_toggle' artwork.pk %}" hx-swap="none">{% csrf_token %}<button class="compare-toggle" type="submit" data-compare-toggle data-artwork-type="legacy" data-artwork-id="{{ artwork.pk }}" data-artwork-title="{{ artwork.title }}" aria-label="{% if artwork.pk in legacy_compare_ids %}Remove{% else %}Add{% endif %} {{ artwork.title }} {% if artwork.pk in legacy_compare_ids %}from{% else %}to{% endif %} compare" aria-pressed="{% if artwork.pk in legacy_compare_ids %}true{% else %}false{% endif %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Compare</span></button></form>
+      </div>
+      <p class="detail-description">{{ artwork.description }}</p>
+      <dl class="art-facts">{% if artwork.medium %}<div><dt>Medium</dt><dd>{{ artwork.medium }}</dd></div>{% endif %}{% if artwork.dimensions %}<div><dt>Dimensions</dt><dd>{{ artwork.dimensions }}</dd></div>{% endif %}<div><dt>Availability</dt><dd>{% if artwork.is_available %}Available{% else %}Collected{% endif %}</dd></div></dl>
+      {% if artwork.is_available %}
+      <div class="purchase-panel">
+        <p class="eyebrow">Make it yours</p>
+        <h2>Choose your finish</h2>
+        <form class="contact-form product-options" action="{% url 'gallery:cart_add' %}" method="post" data-base-price="{{ artwork.price|default_if_none:'' }}">
+          {% csrf_token %}
+          <input type="hidden" name="artwork_id" value="{{ artwork.pk }}">
+          <div class="form-field"><label for="product-size">Size</label><select id="product-size" name="size" data-price-size>{% for option in size_options %}<option value="{{ option.value }}" data-multiplier="{{ option.multiplier }}"{% if option.value == 'medium' %} selected{% endif %}>{{ option.label }}</option>{% endfor %}</select></div>
+          <div class="form-field"><span class="field-label">Frame / border</span><div class="frame-options">{% for value, label in frame_options %}<label class="frame-option"><input type="radio" name="frame" value="{{ value }}" data-frame-option{% if forloop.first %} checked{% endif %}><span class="frame-swatch frame-swatch--{{ value }}" aria-hidden="true"></span><span>{{ label }}</span></label>{% endfor %}</div></div>
+          <div class="form-field"><label for="custom-additions">Custom additions</label><textarea id="custom-additions" name="custom_additions" rows="3" maxlength="2000" placeholder="Add a note for the artist"></textarea></div>
+          <p class="detail-price" data-live-price data-price="{{ artwork.price|default_if_none:'' }}">{% if artwork.price %}PKR {{ artwork.price|floatformat:0 }}{% else %}Price on request{% endif %}</p>
+          <button class="button-link" type="submit">Add to bag <span aria-hidden="true">↗</span></button>
+        </form>
+        <p class="checkout-note">Cash on delivery. Confirm the complete order by WhatsApp at checkout.</p>
+      </div>
+      {% else %}<p class="sold-status">This work has been collected.</p>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

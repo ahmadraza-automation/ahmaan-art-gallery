@@ -1,0 +1,45 @@
+{% load static %}
+{% if press_mentions %}
+<section class="press-strip" aria-label="As featured in">
+  <p class="eyebrow">As featured in</p>
+  <div class="press-logos">{% for mention in press_mentions %}
+    {% if mention.url %}<a href="{{ mention.url }}" target="_blank" rel="noopener">{% else %}<span>{% endif %}
+    {% if mention.logo %}<img src="{{ mention.logo.url }}" alt="{{ mention.publication }}" loading="lazy">{% else %}<strong>{{ mention.publication }}</strong>{% endif %}
+    {% if mention.url %}</a>{% else %}</span>{% endif %}
+  {% endfor %}</div>
+</section>
+{% endif %}
+
+{% if trust_features %}
+<section class="trust-features-section">
+  <div class="editorial-section-heading"><div><p class="eyebrow">A little more peace of mind</p><h2>Why Shop With Us</h2></div></div>
+  <div class="trust-feature-grid">{% for feature in trust_features %}
+    <article class="trust-feature"><span class="trust-feature-icon" aria-hidden="true">{{ feature.icon|default:'✳' }}</span><h3>{{ feature.title }}</h3><p>{{ feature.description }}</p></article>
+  {% endfor %}</div>
+</section>
+{% endif %}
+
+<section class="collector-reviews-section" id="customer-reviews" data-review-carousel>
+  <div class="editorial-section-heading collector-reviews-heading"><div><p class="eyebrow">Kind words, kept close</p><h2>What Our Collectors Are Saying</h2></div>
+    {% if collector_review_average %}<p class="collector-average"><span aria-label="{{ collector_review_average|floatformat:1 }} out of 5 stars">★★★★★</span><strong>{{ collector_review_average|floatformat:1 }}</strong> / 5</p>{% endif %}
+  </div>
+  {% if collector_reviews %}
+  <div class="collector-review-track" data-review-track>
+    {% for review in collector_reviews %}<article class="collector-review-card">
+      <div class="collector-review-stars" aria-label="{{ review.rating }} out of 5 stars">{% for star in '12345' %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+      <h3>{{ review.title }}</h3><p class="collector-review-excerpt">{{ review.text|truncatewords:22 }}</p>
+      {% if review.text|wordcount > 22 %}<details class="collector-read-more"><summary>Read more</summary><p>{{ review.text }}</p></details>{% endif %}
+      {% if review.artwork %}<a class="collector-review-artwork" href="{% url 'gallery:artwork_detail' review.artwork.slug %}">About {{ review.artwork.title }} <span aria-hidden="true">↗</span></a>{% endif %}
+      <footer><strong>{{ review.name }}</strong>{% if review.is_verified %}<span class="verified-review" title="Verified collector" aria-label="Verified collector">✓ Verified</span>{% endif %}<span>{{ review.city }} · {{ review.created_at|date:'M j, Y' }}</span></footer>
+    </article>{% endfor %}
+  </div>
+  <div class="collector-review-controls"><button type="button" data-review-prev aria-label="Scroll to previous reviews">←</button><button type="button" data-review-next aria-label="Scroll to next reviews">→</button></div>
+  {% else %}<p class="collector-review-empty">Be the first collector to share a note about your experience.</p>{% endif %}
+  <details class="collector-review-form-details"><summary>Share your experience</summary>
+    <form class="collector-review-form" method="post" action="{% url 'gallery:review_submit' %}">
+      {% csrf_token %}{{ collector_review_form.website }}
+      {% for field in collector_review_form %}{% if field.name != 'website' %}<label>{{ field.label }}{{ field }}{% for error in field.errors %}<span class="form-error">{{ error }}</span>{% endfor %}</label>{% endif %}{% endfor %}
+      <button class="button-link" type="submit">Submit review</button><p class="collector-review-note">Reviews appear after approval by the gallery.</p>
+    </form>
+  </details>
+</section>

@@ -1,0 +1,15 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="auth-page">
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Your gallery account</p>
+  <h1>Welcome back.</h1>
+  <form class="contact-form" method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="field-error">{{ form.non_field_errors }}</div>{% endif %}
+    {% for field in form %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>{% endfor %}
+    <button class="button-link" type="submit">Sign in <span aria-hidden="true">↗</span></button>
+  </form>
+  <p class="auth-switch">New to the gallery? <a href="{% url 'gallery:signup' %}">Create an account</a></p>
+</section>
+{% endblock %}

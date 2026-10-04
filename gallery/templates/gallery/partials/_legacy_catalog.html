@@ -1,0 +1,19 @@
+{% if shop_page %}<div class="catalog-toolbar">
+  <form class="filter-controls" action="{% if shop_page %}{% url 'gallery:shop' %}{% else %}{% url 'gallery:home' %}{% endif %}#collection" method="get">
+    {% if active_category %}<input type="hidden" name="category" value="{{ active_category }}">{% endif %}
+    {% if search %}<input type="hidden" name="q" value="{{ search }}">{% endif %}
+    <label>From <span class="visually-hidden">minimum price</span><input type="number" name="min_price" min="0" value="{{ min_price }}" placeholder="0"></label>
+    <label>To <span class="visually-hidden">maximum price</span><input type="number" name="max_price" min="0" value="{{ max_price }}" placeholder="{{ max_catalog_price|floatformat:0 }}"></label>
+    <label class="stock-filter">Availability <select name="availability"><option value="">Any stock</option><option value="in-stock"{% if availability == 'in-stock' %} selected{% endif %}>In stock</option><option value="sold-out"{% if availability == 'sold-out' %} selected{% endif %}>Sold out</option></select></label>
+    <label class="sort-filter">Sort <select name="sort"><option value="">Featured</option><option value="price-low"{% if sort == 'price-low' %} selected{% endif %}>Price: low to high</option><option value="price-high"{% if sort == 'price-high' %} selected{% endif %}>Price: high to low</option></select></label>
+    <button class="filter-apply" type="submit">Apply filters</button>
+  </form>
+  <div class="catalog-view-toggle" role="group" aria-label="Collection layout"><button type="button" data-view="grid" class="is-selected" aria-pressed="true">Grid</button><button type="button" data-view="list" aria-pressed="false">List</button></div>
+</div>
+<nav class="filters" aria-label="Filter artworks"><a class="filter-link{% if not active_category %} is-active{% endif %}" href="{% if shop_page %}{% url 'gallery:shop' %}{% else %}{% url 'gallery:home' %}{% endif %}#collection">All work</a>
+  {% for category in categories %}<a class="filter-link{% if active_category == category.slug %} is-active{% endif %}" href="?category={{ category.slug }}{% if search %}&amp;q={{ search|urlencode }}{% endif %}{% if availability %}&amp;availability={{ availability }}{% endif %}{% if min_price %}&amp;min_price={{ min_price }}{% endif %}{% if max_price %}&amp;max_price={{ max_price }}{% endif %}{% if sort %}&amp;sort={{ sort }}{% endif %}#collection">{{ category.name }}</a>{% endfor %}
+</nav>
+{% if artworks %}<div class="art-grid" id="catalog-grid">{% for artwork in artworks %}
+  {% include 'gallery/partials/_legacy_artwork_card.html' %}
+{% endfor %}</div><div class="empty-state catalog-empty" data-filter-empty hidden><span aria-hidden="true">✳</span><p>No work matches these filters.</p></div>
+{% else %}<div class="empty-state"><span aria-hidden="true">✳</span><p>No work in this category just yet.</p><a class="text-link" href="{% url 'gallery:home' %}#collection">See all work <span aria-hidden="true">↗</span></a></div>{% endif %}{% endif %}

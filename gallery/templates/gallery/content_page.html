@@ -1,0 +1,27 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block structured_data %}<script type="application/ld+json">{{ breadcrumb_jsonld|safe }}</script>{% endblock %}
+{% block content %}
+<section class="content-page support-page">
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Helpful information</p>
+  <h1>{{ page_title }}</h1>
+  <p class="lede">{{ intro }}</p>
+
+  {% if show_faqs %}
+  <div class="faq-list">
+    {% for faq in faq_items %}
+    <article class="faq-item">
+      <h2>{{ faq.question }}</h2>
+      <p>{{ faq.answer|linebreaksbr }}</p>
+    </article>
+    {% empty %}
+    <p class="content-note">We are still preparing the frequently asked questions for this section.</p>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="content-body">
+    {{ body|linebreaksbr }}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

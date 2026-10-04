@@ -1,0 +1,5 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="browse-page collections-index"><header class="browse-heading"><p class="eyebrow">Gathered by feeling</p><h1>Collections</h1><p>Small worlds of work, brought together with care.</p></header><div class="collection-index-grid">{% for collection in collections %}<a class="collection-index-card" href="{% url 'gallery:collection_detail' collection.slug %}">{% if collection.cover_image %}<img src="{{ collection.cover_image.url }}" alt="" loading="lazy">{% else %}<span class="collection-index-fallback collection-index-fallback--{{ forloop.counter }}"></span>{% endif %}<span class="collection-index-shade"></span><span class="collection-index-copy"><span>{{ collection.artwork_count }} {% if collection.artwork_count == 1 %}work{% else %}works{% endif %}</span><strong>{{ collection.name }}</strong><small>{{ collection.short_description }}</small><b aria-hidden="true">↗</b></span></a>{% empty %}<p class="content-note">New collections are being prepared.</p>{% endfor %}</div></section>
+{% endblock %}

@@ -1,0 +1,8 @@
+<form class="newsletter-form" action="{% url 'core:newsletter_signup' %}" method="post">
+  {% csrf_token %}
+  <label class="visually-hidden" for="{{ form_id }}">Email address</label>
+  <input id="{{ form_id }}" name="email" type="email" placeholder="Your email address" autocomplete="email" maxlength="254" required>
+  <input name="next" type="hidden" value="{{ request.get_full_path }}">
+  <div class="newsletter-honeypot" aria-hidden="true"><label for="{{ form_id }}-website">Leave this field empty</label><input id="{{ form_id }}-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+  <button type="submit" aria-label="Join the gallery newsletter">{{ submit_label|default:'Join' }} <span aria-hidden="true">↗</span></button>
+</form>

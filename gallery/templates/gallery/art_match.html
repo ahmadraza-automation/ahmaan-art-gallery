@@ -1,0 +1,102 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="content-page support-page art-match-page">
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Curator advice</p>
+  <h1>Find the right piece for your room</h1>
+  <p class="lede">Share a few details about your space, your palette, and your budget and we’ll guide you toward work that feels considered and personal.</p>
+
+  {% if banner %}
+  <aside class="curator-banner">
+    {% if banner.image %}<img src="{{ banner.image.url }}" alt="{{ banner.heading }}" loading="lazy">{% endif %}
+    <div>
+      <p class="eyebrow">A second opinion</p>
+      <h2>{{ banner.heading }}</h2>
+      <p>{{ banner.text }}</p>
+      {% if whatsapp_number %}<a class="button-link" href="https://wa.me/{{ whatsapp_number }}?text={{ banner.whatsapp_message|urlencode }}" target="_blank" rel="noopener">{{ banner.button_text }} <span aria-hidden="true">↗</span></a>{% else %}<a class="button-link" href="{% url 'gallery:contact' %}">{{ banner.button_text }} <span aria-hidden="true">↗</span></a>{% endif %}
+    </div>
+  </aside>
+  {% endif %}
+
+  <div class="art-match-layout" x-data="{ step: 0, total: {{ questions|length|default:0 }} }">
+    <form class="art-match-panel" method="post">
+      {% csrf_token %}<input type="hidden" name="action" value="quiz">
+      {% if questions %}
+        {% for question in questions %}
+        <div class="art-match-step" x-show="step === {{ forloop.counter0 }}" x-transition>
+          <p class="art-match-step-label">Question {{ forloop.counter }} / {{ questions|length }}</p>
+          <h2>{{ question.prompt }}</h2>
+          <div class="art-match-options">
+            {% for option in question.options.all %}
+            <label class="art-match-option">
+              <input type="radio" name="question_{{ question.pk }}" value="{{ option.value }}"{% if question.selected_value == option.value %} checked{% endif %} @change="step = Math.min(total - 1, step + 1)">
+              <span>{{ option.label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="content-note">The curator match guide is being prepared. Please contact the gallery for a personalised recommendation.</div>
+      {% endif %}
+
+      {% if questions %}
+      <div class="art-match-actions">
+        <button type="button" class="secondary-button" x-show="step > 0" @click="step -= 1">Back</button>
+        <button type="submit" class="button-link" x-show="step === total - 1">Show my matches <span aria-hidden="true">↗</span></button>
+      </div>
+      {% endif %}
+    </form>
+
+    <aside class="art-match-summary">
+      <p class="eyebrow">Suggested direction</p>
+      <h2>We’ll match the mood of your space.</h2>
+      <p>{{ recommended_summary }}</p>
+      {% if selected_answers %}
+      <div class="art-match-answers">
+        {% for answer in answer_rows %}
+        <p><strong>{{ answer.key }}:</strong> {{ answer.label }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </aside>
+  </div>
+
+  {% if quiz_submitted %}
+  <section class="art-match-results" aria-live="polite">
+    <div class="editorial-section-heading"><div><p class="eyebrow">Your shortlist</p><h2>Works for your space</h2></div></div>
+    {% if matching_artworks %}<div class="editorial-art-grid editorial-art-grid--four">{% for artwork in matching_artworks %}{% include 'gallery/partials/_catalog_card.html' %}{% endfor %}</div>
+    {% else %}<p class="content-note">We couldn’t find an exact match this time. Talk to our curator for a personal shortlist.</p>{% endif %}
+  </section>
+  {% endif %}
+
+  <div class="contact-card">
+    <div class="contact-aside">
+      <p class="eyebrow">Book a consultation</p>
+      <h2>Talk to the curator</h2>
+      <p>Tell us what kind of room you are styling and we’ll recommend a shortlist that is considered, personal, and easy to live with.</p>
+      {% if site_settings and site_settings.whatsapp_number %}
+      <a class="button-link" href="https://wa.me/{{ site_settings.whatsapp_number }}?text=Hello%2C%20I%20would%20like%20art%20advice." target="_blank" rel="noopener">WhatsApp the gallery <span aria-hidden="true">↗</span></a>
+      {% endif %}
+    </div>
+
+    <form class="contact-form" method="post" action="{% url 'core:art_match' %}" hx-post="{% url 'core:art_match' %}" hx-target="body" hx-swap="outerHTML">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="consultation">
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        {% if not field.is_hidden %}
+        <label>
+          {{ field.label }}
+          {{ field }}
+          {% if field.errors %}<small>{{ field.errors|join:', ' }}</small>{% endif %}
+        </label>
+        {% else %}
+          {{ field }}
+        {% endif %}
+      {% endfor %}
+      <button class="button-link" type="submit">Send request</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="content-page gift-card-page">
+  <p class="eyebrow">A gift with room to grow</p>
+  <h1>Art, chosen by them.</h1>
+  <p class="lede">Choose a fixed PKR amount and we’ll help arrange a gallery gift card for someone special.</p>
+  <div class="gift-card-layout">
+    <div class="gift-card-denominations" aria-label="Gift card denominations">
+      {% for amount, label in form.fields.amount.choices %}<div class="gift-card-denomination"><span>Ahmaan Art Gallery</span><strong>{{ label }}</strong><small>For a piece they’ll make their own</small></div>{% endfor %}
+    </div>
+    <form class="contact-form gift-card-request" method="post">
+      {% csrf_token %}
+      <h2>Request a gift card</h2>
+      {% for field in form %}<label class="form-field"><span>{{ field.label }}</span>{{ field }}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>{% endfor %}
+      <button class="button-link" type="submit">Send request <span aria-hidden="true">↗</span></button>
+    </form>
+  </div>
+</section>
+{% endblock %}

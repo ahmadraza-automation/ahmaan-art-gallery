@@ -1,0 +1,7 @@
+<article class="bundle-card">
+  <a class="bundle-card-image" href="{% url 'gallery:bundle_detail' bundle.slug %}">
+    {% for item in bundle.bundle_items.all %}{% if forloop.first %}{% with cover=item.artwork.images.all|first %}{% if cover %}<img src="{{ cover.image.url }}" alt="{{ item.artwork.title }}" loading="lazy">{% else %}<span class="bundle-image-fallback editorial-art-fallback editorial-art-fallback--{{ item.artwork.category.slug }}" role="img" aria-label="{{ item.artwork.title }}"></span>{% endif %}{% endwith %}{% endif %}{% endfor %}
+    <span class="bundle-count">{{ bundle.bundle_items.count }} works</span>
+  </a>
+  <div class="bundle-card-copy"><div><p class="eyebrow">Curated set</p><h3><a href="{% url 'gallery:bundle_detail' bundle.slug %}">{{ bundle.name }}</a></h3><p>{{ bundle.short_description }}</p></div><div class="bundle-pricing"><strong>PKR {{ bundle.bundle_price|floatformat:0 }}</strong><del>PKR {{ bundle.individual_total|floatformat:0 }}</del><span>Save PKR {{ bundle.savings|floatformat:0 }}</span></div></div>
+</article>

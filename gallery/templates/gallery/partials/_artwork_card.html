@@ -1,0 +1,23 @@
+{% load image_tags %}
+<article class="editorial-art-card" data-reveal data-space-tags="{{ artwork.space_tags|join:','|lower }}" data-color-tags="{{ artwork.color_palette_tags|join:','|lower }}">
+  <div class="editorial-art-visual">
+    <a class="editorial-art-link" href="{% url 'gallery:artwork_detail' artwork.slug %}" aria-label="Explore {{ artwork.title }}">
+      {% for artwork_image in artwork.images.all %}
+        <img class="editorial-art-image{% if forloop.counter == 2 %} editorial-art-image--alternate{% endif %}" src="{{ artwork_image.image.url }}"{% with candidates=artwork_image.image|responsive_srcset %}{% if candidates %} srcset="{{ candidates }}" sizes="(max-width: 640px) 90vw, (max-width: 1000px) 45vw, 30vw"{% endif %}{% endwith %} alt="{{ artwork_image.alt_text|default:artwork.title }}" loading="lazy">
+      {% empty %}
+        <span class="editorial-art-fallback editorial-art-fallback--{{ artwork.category.slug }}" role="img" aria-label="{{ artwork.title }}"></span>
+      {% endfor %}
+      {% if artwork.status == 'sold' %}<span class="sold-ribbon">Sold</span>{% endif %}
+      {% if artwork.is_one_of_a_kind %}<span class="edition-note">One of one</span>{% endif %}
+    </a>
+    <form class="catalog-wishlist-form" method="post" action="{% url 'gallery:wishlist_toggle' artwork.pk %}" hx-post="{% url 'gallery:wishlist_toggle' artwork.pk %}" hx-swap="none" data-wishlist-form>{% csrf_token %}<button class="heart-button" type="submit" data-wishlist-toggle data-wishlist-kind="catalog" data-artwork-id="{{ artwork.pk }}" data-artwork-title="{{ artwork.title }}" aria-label="{% if artwork.pk in wishlist_ids %}Remove{% else %}Save{% endif %} {{ artwork.title }} {% if artwork.pk in wishlist_ids %}from{% else %}to{% endif %} wishlist" aria-pressed="{% if artwork.pk in wishlist_ids %}true{% else %}false{% endif %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.1-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.7A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.6Z"/></svg></button></form>
+    <form class="catalog-compare-form" method="post" action="{% url 'gallery:compare_toggle' artwork.pk %}" hx-post="{% url 'gallery:compare_toggle' artwork.pk %}" hx-swap="none">{% csrf_token %}<button class="compare-toggle" type="submit" data-compare-toggle data-artwork-type="catalog" data-artwork-id="{{ artwork.pk }}" data-artwork-title="{{ artwork.title }}" aria-label="{% if artwork.pk in compare_ids %}Remove{% else %}Add{% endif %} {{ artwork.title }} {% if artwork.pk in compare_ids %}from{% else %}to{% endif %} compare" aria-pressed="{% if artwork.pk in compare_ids %}true{% else %}false{% endif %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></form>
+    <button class="quick-add" type="button" data-quick-view data-quick-view-url="{% url 'gallery:artwork_detail' artwork.slug %}?quick=1" hx-get="{% url 'gallery:artwork_detail' artwork.slug %}?quick=1" hx-target="#quick-view-content" aria-label="Quick view {{ artwork.title }}">Quick view <span aria-hidden="true">↗</span></button>
+  </div>
+  <div class="editorial-art-meta">
+    <div><p class="artwork-artist"><a href="{% url 'gallery:artist_detail' artwork.artist.slug %}">{{ artwork.artist.name }}</a></p><h3><a href="{% url 'gallery:artwork_detail' artwork.slug %}">{{ artwork.title }}</a></h3></div>
+    <span class="artwork-price">PKR {{ artwork.base_price|floatformat:0 }}</span>
+  </div>
+  <p class="artwork-tagline">{{ artwork.mood_tagline }}</p>
+  {% if artwork.status == 'available' %}{% if has_product_options %}<a class="card-select-options" href="{% url 'gallery:artwork_detail' artwork.slug %}">Select options <span aria-hidden="true">↗</span></a>{% else %}<form class="card-quick-add-form" method="post" action="{% url 'gallery:catalog_add' artwork.slug %}">{% csrf_token %}<button class="card-select-options" type="submit">Quick add <span aria-hidden="true">+</span></button></form>{% endif %}{% endif %}
+</article>

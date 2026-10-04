@@ -1,0 +1,32 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block structured_data %}<script type="application/ld+json">{{ article_jsonld|safe }}</script><script type="application/ld+json">{{ breadcrumb_jsonld|safe }}</script>{% endblock %}
+{% block content %}
+<section class="content-page journal-detail-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="{% url 'gallery:home' %}">Home</a><span aria-hidden="true">/</span><a href="{% url 'core:journal_index' %}">Journal</a><span aria-hidden="true">/</span><span aria-current="page">{{ post.title }}</span></nav>
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Journal entry</p>
+  <h1>{{ post.title }}</h1>
+  <p class="journal-date">{{ post.get_category_display }} · {{ post.published_at|date:'F j, Y' }} · {{ post.reading_time_minutes }} min read · By {{ post.author }}</p>
+  {% if post.cover_image %}<img class="journal-cover" src="{{ post.cover_image.url }}" alt="{{ post.title }}" loading="eager">{% endif %}
+  {% include "ads/slot.html" with ad_slot=ad_slot %}
+  <div class="content-body">
+    {{ post.body|linebreaksbr }}
+  </div>
+
+  {% if related_posts %}
+  <div class="related-posts">
+    <p class="eyebrow">More stories</p>
+    <div class="journal-grid">
+      {% for related in related_posts %}
+      <article class="journal-card">
+        <p class="journal-date">{{ related.created_at|date:'F j, Y' }}</p>
+        <h2><a href="{% url 'core:journal_detail' related.slug %}">{{ related.title }}</a></h2>
+        <p>{{ related.excerpt }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

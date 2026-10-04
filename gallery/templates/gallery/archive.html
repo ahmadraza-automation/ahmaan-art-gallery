@@ -1,0 +1,5 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="browse-page sold-archive"><header class="browse-heading"><p class="eyebrow">Works with a new home</p><h1>Sold archive</h1><p>Collected pieces remain part of the story. Browse the archive or ask us to create something with a similar spirit.</p></header><div class="editorial-art-grid editorial-art-grid--three">{% for artwork in artworks %}{% include 'gallery/partials/_catalog_card.html' %}{% empty %}<p class="content-note">The archive is waiting for its first collected work.</p>{% endfor %}</div><a class="button-link" href="{% url 'gallery:commission' %}">Request a similar work <span aria-hidden="true">↗</span></a></section>
+{% endblock %}

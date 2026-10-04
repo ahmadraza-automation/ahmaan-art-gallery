@@ -1,0 +1,45 @@
+{% extends 'gallery/base.html' %}
+{% load static %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="checkout-page part4-checkout">
+  <header class="checkout-heading"><p class="eyebrow">A little closer to home</p><h1>Complete your order</h1><p class="delivery-estimate">Estimated delivery: {{ delivery_start|date:'M j' }}–{{ delivery_end|date:'M j, Y' }}</p></header>
+  {% include 'gallery/partials/_payment_methods.html' %}
+  <div class="checkout-layout">
+    <form class="contact-form checkout-form" method="post" enctype="multipart/form-data" id="part4-checkout-form">
+      {% csrf_token %}<h2>Your details</h2>
+      {% if form.non_field_errors %}<div class="field-error">{{ form.non_field_errors }}</div>{% endif %}
+      {% if form.saved_address %}<label class="form-field"><span>{{ form.saved_address.label }}</span>{{ form.saved_address }}{% for error in form.saved_address.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>{% endif %}
+      {% for field in form %}{% if field.name != 'saved_address' and field.name != 'payment_method' and field.name != 'payment_proof' and field.name != 'coupon_code' and field.name != 'gift_card_code' and field.name != 'customer_note' %}<label class="form-field"><span>{{ field.label }}</span>{{ field }}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>{% endif %}{% endfor %}
+      <label class="form-field"><span>{{ form.customer_note.label }}</span>{{ form.customer_note }}{% for error in form.customer_note.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>
+      <fieldset class="payment-options"><legend>Payment method</legend><div class="payment-option-grid">
+        {% for radio in form.payment_method %}<label class="payment-option-card">
+          {{ radio.tag }}
+          <span class="payment-option-copy"><strong>{{ radio.choice_label }}</strong>
+            {% if radio.data.value == 'cod' %}<small>Pay cash when your order is delivered.</small>
+            {% elif radio.data.value == 'bank_transfer' %}<small>Transfer to the gallery bank account; details appear when selected.</small>
+            {% elif radio.data.value == 'jazzcash' %}<small>Pay through JazzCash; instructions appear when selected.</small>
+            {% elif radio.data.value == 'easypaisa' %}<small>Pay through Easypaisa; instructions appear when selected.</small>
+            {% else %}<small>The gallery will confirm payment details with your order.</small>{% endif %}
+          </span>
+        </label>{% endfor %}
+      </div>{% for error in form.payment_method.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</fieldset>
+      <div class="payment-account-details" data-payment-details-list>
+        {% for details in payment_options %}<section class="payment-account" data-payment-details="{{ details.method }}"{% if details.method != form.payment_method.value|default:'cod' %} hidden{% endif %}><h3>{{ details.label }}</h3>{% if details.account_title %}<p><span>Account name</span><strong>{{ details.account_title }}</strong></p>{% endif %}{% if details.institution %}<p><span>Provider / bank</span><strong>{{ details.institution }}</strong></p>{% endif %}{% if details.account_number %}<p><span>Account / number</span><strong>{{ details.account_number }}</strong></p>{% endif %}{% if details.extra %}<p><span>IBAN</span><strong>{{ details.extra }}</strong></p>{% endif %}{% if details.message %}<p class="payment-instructions">{{ details.message }}</p>{% endif %}</section>{% endfor %}
+      </div>
+      <label class="form-field payment-proof-field" data-payment-proof-field><span>{{ form.payment_proof.label }}</span>{{ form.payment_proof }}{% if form.payment_proof.help_text %}<small>{{ form.payment_proof.help_text }}</small>{% endif %}{% for error in form.payment_proof.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>
+      <label class="form-field coupon-field"><span>{{ form.coupon_code.label }}</span><div class="coupon-entry">{{ form.coupon_code }}<button type="submit" class="coupon-apply">Apply</button></div>{% for error in form.coupon_code.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>
+      <label class="form-field coupon-field"><span>{{ form.gift_card_code.label }}</span><div class="coupon-entry">{{ form.gift_card_code }}<button type="submit" class="coupon-apply">Redeem</button></div>{% for error in form.gift_card_code.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>
+      <button class="button-link checkout-submit" type="submit">Place order <span aria-hidden="true">↗</span></button>
+    </form>
+    <aside class="checkout-summary"><p class="eyebrow">Your order</p><h2>Order summary</h2>
+      {% for line in cart_rows %}<div class="summary-line"><div><strong>{{ line.title }}</strong><span>{{ line.quantity }} × {% if line.size.name %}{{ line.size.name }}{% else %}{{ line.size|title }}{% endif %}{% if line.frame.name %} · {{ line.frame.name }}{% else %} · {{ line.frame|title }}{% endif %}{% if line.canvas %} · {{ line.canvas.name }}{% endif %}</span>{% if line.custom_text %}<small>{{ line.custom_text }}</small>{% endif %}</div><strong>PKR {{ line.line_total|floatformat:0 }}</strong></div>{% endfor %}
+      <div class="summary-total-row"><span>Subtotal</span><strong>PKR {{ subtotal|floatformat:0 }}</strong></div>
+      <div class="summary-total-row"><span>Delivery</span><strong>{% if shipping %}PKR {{ shipping|floatformat:0 }}{% else %}Complimentary{% endif %}</strong></div>
+      {% if discount %}<div class="summary-total-row"><span>Discount{% if coupon %} · {{ coupon.code }}{% endif %}{% if gift_card %} · {{ gift_card.code }}{% endif %}</span><strong>− PKR {{ discount|floatformat:0 }}</strong></div>{% endif %}
+      <div class="summary-total-row summary-grand-total"><span>Total</span><strong>PKR {{ total|floatformat:0 }}</strong></div>
+      <p class="checkout-safe-note">Your payment details are handled securely. Order confirmation and the authenticity certificate will be sent to your email.</p>
+    </aside>
+  </div>
+</section>
+{% endblock %}

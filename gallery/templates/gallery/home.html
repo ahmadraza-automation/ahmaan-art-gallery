@@ -1,0 +1,73 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+{% if not shop_page %}
+<section class="intro">
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Independent art, thoughtfully found</p>
+  <h1>Find a piece<br>that <em>stays with you.</em></h1>
+  <p class="intro-copy">A considered collection of original work by artists with a point of view. Take your time, look closer, find your something.</p>
+  <a class="text-link" href="#collection">Explore the collection <span aria-hidden="true">↓</span></a>
+</section>
+{% if featured %}
+<section class="featured" aria-label="Featured artwork">
+  <a class="featured-image" href="{% url 'gallery:artwork_detail' featured.slug %}" style="--art-image: url('{{ featured.image_url }}')"><span class="image-label">On view</span></a>
+  <div class="featured-caption"><div><span class="eyebrow">Featured work</span><h2><a href="{% url 'gallery:artwork_detail' featured.slug %}">{{ featured.title }}</a></h2><p>{{ featured.artist }}{% if featured.year %} &middot; {{ featured.year }}{% endif %}</p></div><a class="round-link" href="{% url 'gallery:artwork_detail' featured.slug %}" aria-label="View {{ featured.title }}">↗</a></div>
+</section>
+{% endif %}
+{% if popular %}
+<section class="collection popular-collection" aria-label="Popular artwork">
+  <div class="section-heading"><div><p class="eyebrow">Loved by collectors</p><h2>Popular right now</h2></div></div>
+  <div class="art-grid">
+    {% for artwork in popular %}
+    <article class="art-card">
+      <a class="art-image" href="{% url 'gallery:artwork_detail' artwork.slug %}" style="--art-image: url('{{ artwork.image_url }}')" aria-label="View {{ artwork.title }}"></a>
+      <div class="art-meta"><div><h3><a href="{% url 'gallery:artwork_detail' artwork.slug %}">{{ artwork.title }}</a></h3><p>{{ artwork.artist }}{% if artwork.year %} &middot; {{ artwork.year }}{% endif %}</p></div><span class="category-label">{{ artwork.get_category_display }}</span></div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% else %}
+<section class="intro shop-intro">
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Original work, made to stay</p>
+  <h1>Gallery <em>&amp; shop.</em></h1>
+  <p class="intro-copy">Browse original paintings, calligraphy, digital work and handmade pieces. Ask us about a custom size or a personal touch.</p>
+</section>
+{% endif %}
+<section class="collection" id="collection">
+  <div class="section-heading"><div><p class="eyebrow">A small world of its own</p><h2>{% if shop_page %}Browse the work{% else %}The collection{% endif %}</h2></div><span class="art-count" data-art-count>{{ artworks|length }} {% if artworks|length == 1 %}work{% else %}works{% endif %}</span></div>
+  <div class="catalog-toolbar">
+    <form class="filter-controls" action="{% if shop_page %}{% url 'gallery:shop' %}{% else %}{% url 'gallery:home' %}{% endif %}#collection" method="get">
+      {% if active_category %}<input type="hidden" name="category" value="{{ active_category }}">{% endif %}
+      {% if search %}<input type="hidden" name="q" value="{{ search }}">{% endif %}
+      <label>From <span class="visually-hidden">minimum price</span><input type="number" name="min_price" min="0" value="{{ min_price }}" placeholder="0"></label>
+      <label>To <span class="visually-hidden">maximum price</span><input type="number" name="max_price" min="0" value="{{ max_price }}" placeholder="{{ max_catalog_price|floatformat:0 }}"></label>
+      <label class="stock-filter">Availability <select name="availability"><option value="">Any stock</option><option value="in-stock"{% if availability == 'in-stock' %} selected{% endif %}>In stock</option><option value="sold-out"{% if availability == 'sold-out' %} selected{% endif %}>Sold out</option></select></label>
+      <label class="sort-filter">Sort <select name="sort"><option value="">Featured</option><option value="price-low"{% if sort == 'price-low' %} selected{% endif %}>Price: low to high</option><option value="price-high"{% if sort == 'price-high' %} selected{% endif %}>Price: high to low</option></select></label>
+      <button class="filter-apply" type="submit">Apply filters</button>
+    </form>
+    <div class="catalog-view-toggle" role="group" aria-label="Collection layout">
+      <button type="button" data-view="grid" class="is-selected" aria-pressed="true">Grid</button>
+      <button type="button" data-view="list" aria-pressed="false">List</button>
+    </div>
+  </div>
+  <nav class="filters" aria-label="Filter artworks">
+    <a class="filter-link{% if not active_category %} is-active{% endif %}" href="{% if shop_page %}{% url 'gallery:shop' %}{% else %}{% url 'gallery:home' %}{% endif %}#collection">All work</a>
+    {% for category in categories %}<a class="filter-link{% if active_category == category.slug %} is-active{% endif %}" href="?category={{ category.slug }}{% if search %}&amp;q={{ search|urlencode }}{% endif %}{% if availability %}&amp;availability={{ availability }}{% endif %}{% if min_price %}&amp;min_price={{ min_price }}{% endif %}{% if max_price %}&amp;max_price={{ max_price }}{% endif %}{% if sort %}&amp;sort={{ sort }}{% endif %}#collection">{{ category.name }}</a>{% endfor %}
+  </nav>
+  {% if artworks %}
+  <div class="art-grid" id="catalog-grid">
+    {% for artwork in artworks %}
+    <article class="art-card" data-title="{{ artwork.title|lower }}" data-artist="{{ artwork.artist|lower }}" data-category="{{ artwork.category.name|lower }}" data-price="{{ artwork.price|default:'0' }}" data-stock="{{ artwork.is_available|yesno:'in-stock,sold-out' }}">
+      <a class="art-image" data-tilt href="{% url 'gallery:artwork_detail' artwork.slug %}" style="--art-image: url('{{ artwork.image_url }}')" aria-label="View {{ artwork.title }}">{% if not artwork.is_available %}<span class="image-label sold-label">Sold out</span>{% endif %}</a>
+      <div class="art-meta"><div><h3><a href="{% url 'gallery:artwork_detail' artwork.slug %}">{{ artwork.title }}</a></h3><p>{{ artwork.artist }}{% if artwork.year %} &middot; {{ artwork.year }}{% endif %}</p>{% if artwork.price %}<strong class="card-price">PKR {{ artwork.price|floatformat:0 }}</strong>{% else %}<span class="card-price is-unpriced">Price on request</span>{% endif %}</div><span class="category-label">{{ artwork.get_category_display }}</span></div>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="empty-state catalog-empty" data-filter-empty hidden><span aria-hidden="true">✳</span><p>No work matches these filters.</p></div>
+  {% else %}
+  <div class="empty-state"><span aria-hidden="true">✳</span><p>No work in this category just yet.</p><a class="text-link" href="{% url 'gallery:home' %}#collection">See all work <span aria-hidden="true">↗</span></a></div>
+  {% endif %}
+</section>
+<section class="visit-band"><div><p class="eyebrow">For the curious</p><h2>Good art makes<br>room for a conversation.</h2></div><a class="button-link" href="{% url 'gallery:contact' %}">Plan a visit or enquire <span aria-hidden="true">↗</span></a></section>
+{% endblock %}

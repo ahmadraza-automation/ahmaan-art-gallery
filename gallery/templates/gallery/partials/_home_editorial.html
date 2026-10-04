@@ -1,0 +1,110 @@
+{% load static %}
+<section class="homepage-hero" data-hero-slider aria-label="Featured gallery stories">
+  {% for slide in hero_slides %}
+  <article class="hero-slide{% if forloop.first %} is-active{% endif %}" data-hero-slide{% if not forloop.first %} hidden{% endif %}>
+    {% if slide.video_media.is_enabled and slide.video_media.video_url %}
+    <video class="hero-media" autoplay muted loop playsinline poster="{{ slide.image.url }}" aria-label="{{ slide.title }}"><source src="{{ slide.video_media.video_url }}"></video>
+    {% else %}<img class="hero-media" src="{{ slide.image.url }}" alt="" fetchpriority="high">{% endif %}
+    <div class="hero-shade"></div>
+    <div class="hero-copy"><p class="eyebrow hero-eyebrow">Ahmaan Art Gallery · Lahore</p><h1>{{ slide.title }}</h1>{% if slide.subtitle %}<p>{{ slide.subtitle }}</p>{% endif %}<a class="hero-cta" href="{{ slide.button_url|default:'/shop/' }}">{{ slide.button_text|default:'Explore the collection' }} <span aria-hidden="true">↗</span></a></div>
+  </article>
+  {% empty %}
+  <article class="hero-slide is-active" data-hero-slide>
+    {% if featured %}<img class="hero-media" src="{{ featured.image_url }}" alt="Artwork: {{ featured.title }}" fetchpriority="high">{% else %}<img class="hero-media" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=2200&q=85" alt="A quiet gallery wall with original art" fetchpriority="high">{% endif %}
+    <div class="hero-shade"></div><div class="hero-copy"><p class="eyebrow hero-eyebrow">Independent art · Pakistan</p><h1>Make room<br>for <em>feeling.</em></h1><p>Original works, gathered slowly and made to live with.</p><a class="hero-cta" href="{% url 'gallery:shop' %}">Explore the collection <span aria-hidden="true">↗</span></a></div>
+  </article>
+  {% endfor %}
+  <div class="hero-controls" data-hero-controls>
+    <span class="hero-index" data-hero-count aria-label="Slide 1 of {% if hero_slides %}{{ hero_slides|length }}{% else %}1{% endif %}"><span data-hero-current>01</span><i>/</i><span data-hero-total>{% if hero_slides %}{{ hero_slides|length|stringformat:'02d' }}{% else %}01{% endif %}</span></span>
+    <button type="button" data-hero-prev aria-label="Previous slide"><span aria-hidden="true">←</span></button>
+    <div class="hero-dots" role="group" aria-label="Choose a hero slide">{% for slide in hero_slides %}<button type="button" data-hero-dot="{{ forloop.counter0 }}" aria-label="Show slide {{ forloop.counter }}"{% if forloop.first %} aria-current="true"{% endif %}></button>{% endfor %}</div>
+    <button type="button" data-hero-next aria-label="Next slide"><span aria-hidden="true">→</span></button>
+  </div>
+</section>
+
+<section class="trust-strip" aria-label="The Ahmaan experience">
+  <div><span class="trust-mark" aria-hidden="true">✳</span><span>Made by hand</span></div>
+  <div><span class="trust-mark" aria-hidden="true">01</span><span>One of a kind</span></div>
+  <div><span class="trust-mark" aria-hidden="true">⌑</span><span>Certificate of authenticity</span></div>
+  <div><span class="trust-mark" aria-hidden="true">◇</span><span>Gift-ready packaging</span></div>
+  <div><span class="trust-mark" aria-hidden="true">↗</span><span>Secure delivery</span></div>
+</section>
+
+{% include 'gallery/partials/_home_how_it_works.html' %}
+
+<section class="editorial-section featured-works-section" id="featured-works">
+  <div class="editorial-section-heading"><div><p class="eyebrow">Chosen for you</p><h2>Featured works</h2></div><a class="editorial-text-link" href="{% url 'gallery:shop' %}">View all works <span aria-hidden="true">↗</span></a></div>
+  <div class="editorial-art-grid editorial-art-grid--three">{% for artwork in featured_works %}{% include 'gallery/partials/_artwork_card.html' %}{% empty %}<p class="content-note">New work is being prepared for the gallery.</p>{% endfor %}</div>
+</section>
+
+<section class="collections-section">
+  <div class="editorial-section-heading"><div><p class="eyebrow">Gathered around a feeling</p><h2>Curated collections</h2></div><p class="section-aside">Each collection begins with a point of view.</p></div>
+  <div class="curated-grid">{% for collection in art_collections %}
+    <a class="curated-card curated-card--{{ forloop.counter }}" href="{% url 'gallery:shop' %}#collection">
+      {% if collection.cover_image %}<img src="{{ collection.cover_image.url }}" alt="" loading="lazy">{% else %}<span class="curated-card-art" aria-hidden="true"></span>{% endif %}
+      <span class="curated-card-shade"></span><span class="curated-card-copy"><small>Collection {{ forloop.counter|stringformat:'02d' }}</small><strong>{{ collection.name }}</strong><span>{{ collection.short_description|default:'An original gathering from the gallery.' }}</span></span><span class="curated-arrow" aria-hidden="true">↗</span>
+    </a>
+  {% empty %}<a class="curated-card curated-card--1" href="{% url 'gallery:shop' %}"><span class="curated-card-art" aria-hidden="true"></span><span class="curated-card-shade"></span><span class="curated-card-copy"><small>Discover</small><strong>The collection</strong><span>Original art, found slowly.</span></span></a>{% endfor %}</div>
+</section>
+
+<section class="editorial-section bestseller-section">
+  <div class="editorial-section-heading"><div><p class="eyebrow">Collected and cherished</p><h2>Best sellers</h2></div><a class="editorial-text-link" href="{% url 'gallery:shop' %}">Explore the gallery <span aria-hidden="true">↗</span></a></div>
+  <div class="editorial-art-grid editorial-art-grid--four">{% for artwork in best_sellers %}{% include 'gallery/partials/_artwork_card.html' %}{% empty %}<p class="content-note">A considered selection is on its way.</p>{% endfor %}</div>
+</section>
+
+{% if featured_bundles %}<section class="editorial-section homepage-bundles"><div class="editorial-section-heading"><div><p class="eyebrow">Made to belong together</p><h2>Curated sets</h2></div><a class="editorial-text-link" href="{% url 'gallery:shop' %}">Shop the sets <span aria-hidden="true">↗</span></a></div><div class="bundle-card-grid">{% for bundle in featured_bundles %}{% include 'gallery/partials/_bundle_card.html' %}{% endfor %}</div></section>{% endif %}
+
+<section class="discovery-band" aria-label="Find art for your space">
+  <div class="discovery-copy"><p class="eyebrow">Where will it live?</p><h2>Art changes<br>the feeling of a room.</h2><p>Begin with the place you imagine it.</p></div>
+  <div class="space-list">{% for space in shop_spaces %}<button type="button" class="space-choice" data-home-filter="space" data-filter-value="{{ space|lower }}"><span>{{ space|title }}</span><span aria-hidden="true">↗</span></button>{% empty %}<button type="button" class="space-choice" data-home-filter="space" data-filter-value="home"><span>Home</span><span aria-hidden="true">↗</span></button><button type="button" class="space-choice" data-home-filter="space" data-filter-value="cafe"><span>Cafe</span><span aria-hidden="true">↗</span></button><button type="button" class="space-choice" data-home-filter="space" data-filter-value="office"><span>Office</span><span aria-hidden="true">↗</span></button><button type="button" class="space-choice" data-home-filter="space" data-filter-value="gallery"><span>Gallery</span><span aria-hidden="true">↗</span></button>{% endfor %}<button class="space-choice space-choice--clear" type="button" data-home-filter="clear"><span>Show everything</span><span aria-hidden="true">×</span></button></div>
+</section>
+
+<section class="palette-section">
+  <div><p class="eyebrow">Choose a colour to begin</p><h2>Shop by palette</h2></div>
+  <div class="palette-list">{% for color in palette_colors %}<button type="button" class="palette-choice" data-home-filter="color" data-filter-value="{{ color|lower }}"><span class="palette-swatch palette-swatch--{{ color|slugify }}"></span><span>{{ color|title }}</span></button>{% empty %}<button type="button" class="palette-choice" data-home-filter="color" data-filter-value="indigo"><span class="palette-swatch palette-swatch--indigo"></span><span>Indigo</span></button><button type="button" class="palette-choice" data-home-filter="color" data-filter-value="sage"><span class="palette-swatch palette-swatch--sage"></span><span>Sage</span></button><button type="button" class="palette-choice" data-home-filter="color" data-filter-value="umber"><span class="palette-swatch palette-swatch--umber"></span><span>Umber</span></button>{% endfor %}</div>
+</section>
+
+{% include 'gallery/partials/_home_discovery.html' %}
+
+<section class="story-section{% if brand_story %} story-section--managed{% endif %}">
+  <div class="story-image" role="img" aria-label="Original paintings gathered in a calm, light-filled interior">{% if brand_story.image %}<img src="{{ brand_story.image.url }}" alt="{{ brand_story.heading }}" loading="lazy">{% endif %}</div>
+  <div class="story-copy">
+    {% if brand_story %}<p class="eyebrow">A gallery with a point of view</p><h2>{{ brand_story.heading|linebreaksbr }}</h2><p>{{ brand_story.story }}</p><a class="editorial-text-link" href="{% url 'gallery:about' %}">{{ brand_story.button_text }} <span aria-hidden="true">↗</span></a>
+    {% else %}<p class="eyebrow">A gallery with a point of view</p><h2>Made to meet you<br>where you are.</h2><p>We bring together original work by artists who notice the details others pass by. Each piece is chosen for its honesty, its craft, and the feeling it leaves in a room.</p><a class="editorial-text-link" href="{% url 'gallery:about' %}">The story behind the gallery <span aria-hidden="true">↗</span></a>{% endif %}
+  </div>
+</section>
+
+<section class="unboxing-section">
+  <div class="unboxing-copy"><p class="eyebrow">The unboxing moment</p><h2>From our hands<br>to your home.</h2><p>Every work is carefully wrapped, protected for its journey, and accompanied by its own certificate of authenticity.</p><a class="editorial-text-link" href="{% url 'gallery:contact' %}">Ask us about delivery <span aria-hidden="true">↗</span></a></div>
+  <div class="unboxing-image" role="img" aria-label="Carefully wrapped artwork ready for delivery"></div>
+</section>
+
+<section class="manifesto-section">
+  <p class="eyebrow">What we believe</p><h2>Art is not an answer.<br>It is a way of <em>looking.</em></h2>
+  <div class="manifesto-lines"><p>Keep what moves you.</p><p>Make space for the unexpected.</p><p>Let a room tell your story.</p></div>
+</section>
+
+<section class="editorial-section new-arrivals-section">
+  <div class="editorial-section-heading"><div><p class="eyebrow">Just arrived</p><h2>New arrivals</h2></div><a class="editorial-text-link" href="{% url 'gallery:shop' %}">See every new work <span aria-hidden="true">↗</span></a></div>
+  <div class="editorial-art-grid editorial-art-grid--four">{% for artwork in new_arrivals %}{% include 'gallery/partials/_artwork_card.html' %}{% empty %}<p class="content-note">Fresh work will appear here as it joins the collection.</p>{% endfor %}</div>
+</section>
+
+{% if spotlight_artist %}<section class="artist-spotlight">
+  <div class="artist-portrait">{% if spotlight_artist.photo %}<img src="{{ spotlight_artist.photo.url }}" alt="Portrait of {{ spotlight_artist.name }}" loading="lazy">{% else %}<span role="img" aria-label="Artist studio portrait"></span>{% endif %}</div>
+  <div class="artist-spotlight-copy"><p class="eyebrow">Artist spotlight</p><h2>{{ spotlight_artist.name }}</h2><p class="artist-specialty">{{ spotlight_artist.specialty }}</p><p>{{ spotlight_artist.bio|default:'An independent artist whose practice is rooted in curiosity, careful observation, and an enduring love of making.'|truncatewords:36 }}</p><a class="editorial-text-link" href="{% url 'gallery:shop' %}">Discover the work <span aria-hidden="true">↗</span></a></div>
+  <div class="artist-work-list">{% for artwork in spotlight_artworks %}<a href="{% url 'gallery:shop' %}"><span>{{ artwork.title }}</span><span aria-hidden="true">↗</span></a>{% endfor %}</div>
+</section>{% endif %}
+
+{% if instagram_images %}<section class="instagram-section"><div class="editorial-section-heading"><div><p class="eyebrow">From the studio and our homes</p><h2>Life with art</h2></div>{% if site_settings.instagram_url %}<a class="editorial-text-link" href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener">Follow along <span aria-hidden="true">↗</span></a>{% endif %}</div><div class="instagram-grid">{% for post in instagram_images %}<a href="{{ post.post_url|default:site_settings.instagram_url|default:'#' }}" class="instagram-tile" aria-label="{{ post.caption|default:'View gallery on Instagram' }}">{% if post.image %}<img src="{{ post.image.url }}" alt="{{ post.caption }}" loading="lazy">{% else %}<span aria-hidden="true"></span>{% endif %}<span class="instagram-overlay">{{ post.caption|default:'View the moment' }}</span></a>{% endfor %}</div></section>{% endif %}
+
+{% if testimonials %}<section class="testimonial-section" data-testimonial-carousel><p class="eyebrow">Kind words, kept close</p><h2>Notes from collectors</h2><div class="testimonial-track">{% for testimonial in testimonials %}<blockquote class="testimonial-slide{% if forloop.first %} is-active{% endif %}" data-testimonial-slide{% if not forloop.first %} hidden{% endif %}><div class="testimonial-stars" aria-label="{{ testimonial.rating }} out of 5 stars">{% for star in '12345' %}{% if forloop.counter <= testimonial.rating %}★{% endif %}{% endfor %}</div><p>“{{ testimonial.quote }}”</p>{% include 'gallery/partials/_testimonial_attribution.html' %}</blockquote>{% endfor %}</div><div class="testimonial-controls"><button type="button" data-testimonial-prev aria-label="Previous testimonial">←</button><span data-testimonial-count>01 / {{ testimonials|length|stringformat:'02d' }}</span><button type="button" data-testimonial-next aria-label="Next testimonial">→</button></div></section>{% endif %}
+
+{% if journal_posts %}<section class="journal-section"><div class="editorial-section-heading"><div><p class="eyebrow">Thoughts from the studio</p><h2>Latest from the journal</h2></div><a class="editorial-text-link" href="{% url 'core:journal_index' %}">More stories <span aria-hidden="true">↗</span></a></div><div class="journal-grid">{% for post in journal_posts %}<article class="journal-card">{% if post.cover_image %}<a class="journal-image" href="{% url 'core:journal_detail' post.slug %}"><img src="{{ post.cover_image.url }}" alt="{{ post.title }}" loading="lazy"></a>{% else %}<a class="journal-image journal-image--{{ forloop.counter }}" href="{% url 'core:journal_detail' post.slug %}" aria-label="Read {{ post.title }}"></a>{% endif %}<p class="journal-date">{{ post.created_at|date:'F j, Y' }}</p><h3><a href="{% url 'core:journal_detail' post.slug %}">{{ post.title }}</a></h3><p>{{ post.excerpt }}</p></article>{% endfor %}</div></section>{% endif %}
+
+{% if popular %}<section class="editorial-section legacy-popular-section"><div class="editorial-section-heading"><div><p class="eyebrow">A familiar favourite</p><h2>Popular right now</h2></div></div><div class="legacy-popular-grid">{% for artwork in popular %}<a class="legacy-popular-card" href="{% url 'gallery:artwork_detail' artwork.slug %}" style="--art-image:url('{{ artwork.image_url }}')"><span>{{ artwork.title }}</span><small>{{ artwork.artist }}</small></a>{% endfor %}</div></section>{% endif %}
+
+<section class="editorial-browse-section" id="collection"><div class="editorial-section-heading"><div><p class="eyebrow">The wider gallery</p><h2>Browse every work</h2></div><a class="editorial-text-link" href="{% url 'gallery:shop' %}">Open the gallery <span aria-hidden="true">↗</span></a></div>{% include 'gallery/partials/_legacy_catalog.html' with shop_page=True %}</section>
+
+<section class="homepage-newsletter"><div><p class="eyebrow">Letters from Ahmaan</p><h2>Keep a little room<br>for wonder.</h2><p>Occasional notes on new work, artists, and the homes they find.</p></div>{% include 'gallery/partials/_newsletter_form.html' with form_id='newsletter-home' %}</section>
+
+{% include 'gallery/partials/_home_trust.html' %}

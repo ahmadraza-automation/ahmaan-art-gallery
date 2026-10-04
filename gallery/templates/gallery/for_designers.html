@@ -1,0 +1,20 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block structured_data %}<script type="application/ld+json">{{ breadcrumb_jsonld|safe }}</script>{% endblock %}
+{% block content %}
+<section class="content-page designers-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="{% url 'gallery:home' %}">Home</a><span aria-hidden="true">/</span><span aria-current="page">For Interior Designers</span></nav>
+  <p class="eyebrow">A considered art partner</p>
+  <h1>For Interior Designers</h1>
+  <p class="lede">Source original artworks for residential, hospitality, and workplace projects. Share a little about the brief and our gallery team will help you shape a shortlist.</p>
+  <div class="designer-inquiry-layout">
+    <div class="designer-inquiry-copy"><h2>Art that belongs in the room</h2><p>Tell us about your project, timeline, location, and the atmosphere you want to create. We can help identify available works and coordinate details with the artists.</p><a class="editorial-text-link" href="{% url 'gallery:artists' %}">Meet our artists <span aria-hidden="true">↗</span></a></div>
+    <form class="contact-form designer-inquiry-form" method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}{% if field.is_hidden %}{{ field }}{% else %}<label class="form-field"><span>{{ field.label }}</span>{{ field }}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>{% endif %}{% endfor %}
+      <button class="button-link" type="submit">Send project inquiry <span aria-hidden="true">↗</span></button>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'gallery/base.html' %}
+{% load static %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block structured_data %}<script type="application/ld+json">{{ breadcrumb_jsonld|safe }}</script>{% endblock %}
+{% block content %}
+<section class="shop-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="{% url 'gallery:home' %}">Home</a><span aria-hidden="true">/</span><span aria-current="page">Artworks</span></nav><header class="shop-page-heading"><p class="eyebrow">Original work, chosen slowly</p><h1>The gallery</h1><p>Find the work that feels at home with you.</p></header>
+  {% include "ads/slot.html" with ad_slot=ad_slot %}
+  {% if bundles %}<section class="shop-bundles"><div class="shop-section-title"><div><p class="eyebrow">Collected together</p><h2>Curated sets</h2></div><span>Two or three works, one considered price.</span></div><div class="bundle-card-grid">{% for bundle in bundles %}{% include 'gallery/partials/_bundle_card.html' %}{% endfor %}</div></section>{% endif %}
+  <div class="shop-layout">
+    <aside class="shop-filter-rail" aria-labelledby="filter-title">
+      <div class="filter-rail-title"><h2 id="filter-title">Refine</h2><a href="{% url 'gallery:shop' %}">Reset</a></div>
+      <form id="shop-filters" class="shop-filters" method="get" action="{% url 'gallery:shop' %}" hx-get="{% url 'gallery:shop' %}" hx-trigger="change, input delay:350ms" hx-target="#shop-results" hx-swap="outerHTML" hx-push-url="true" hx-sync="this:replace">
+        <input type="hidden" name="columns" value="{{ column_count }}" data-columns-value>
+        <label class="shop-filter-field">Availability<select name="availability"><option value="">Any availability</option><option value="available"{% if filter_values.availability == 'available' %} selected{% endif %}>Available</option><option value="reserved"{% if filter_values.availability == 'reserved' %} selected{% endif %}>Reserved</option><option value="sold"{% if filter_values.availability == 'sold' %} selected{% endif %}>Sold</option></select></label>
+        <fieldset class="price-filter"><legend>Price range <small>PKR</small></legend><label>From <output data-range-label="min">{{ min_price }}</output><input type="range" min="0" max="{{ max_price }}" step="500" name="min_price" value="{{ min_price }}" data-price-range="min"></label><label>To <output data-range-label="max">{{ max_price_value }}</output><input type="range" min="0" max="{{ max_price }}" step="500" name="max_price" value="{{ max_price_value }}" data-price-range="max"></label></fieldset>
+        <label class="shop-filter-field">Category<select name="category"><option value="">All categories</option>{% for option in categories %}<option value="{{ option.slug }}"{% if filter_values.category == option.slug %} selected{% endif %}>{{ option.name }}</option>{% endfor %}</select></label>
+        <label class="shop-filter-field">Collection<select name="collection"><option value="">All collections</option>{% for option in collections %}<option value="{{ option.slug }}"{% if filter_values.collection == option.slug %} selected{% endif %}>{{ option.name }}</option>{% endfor %}</select></label>
+        <label class="shop-filter-field">Size<select name="size"><option value="">Any size</option>{% for option in size_options %}<option value="{{ option.pk }}"{% if filter_values.size == option.pk|stringformat:'s' %} selected{% endif %}>{{ option.name }}</option>{% endfor %}</select></label>
+        <label class="shop-filter-field">Artwork dimensions<select name="size_band"><option value="">Any dimensions</option>{% for value, label in size_bands %}<option value="{{ value }}"{% if filter_values.size_band == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+        <label class="shop-filter-field">Medium<select name="medium"><option value="">Any medium</option>{% for option in mediums %}<option value="{{ option }}"{% if filter_values.medium == option %} selected{% endif %}>{{ option }}</option>{% endfor %}</select></label>
+        <label class="shop-filter-field">Style<select name="style"><option value="">Any style</option>{% for option in styles %}<option value="{{ option }}"{% if filter_values.style == option %} selected{% endif %}>{{ option|title }}</option>{% endfor %}</select></label>
+        <label class="shop-filter-field">Subject<select name="subject"><option value="">Any subject</option>{% for option in subjects %}<option value="{{ option }}"{% if filter_values.subject == option %} selected{% endif %}>{{ option|title }}</option>{% endfor %}</select></label>
+        <label class="shop-filter-field">Colour palette<select name="color"><option value="">Any palette</option>{% for option in colors %}<option value="{{ option }}"{% if filter_values.color == option %} selected{% endif %}>{{ option|title }}</option>{% endfor %}</select></label>
+        <label class="shop-filter-field">Mood<select name="mood"><option value="">Any mood</option>{% for option in moods %}<option value="{{ option }}"{% if filter_values.mood == option %} selected{% endif %}>{{ option|title }}</option>{% endfor %}</select></label>
+        <label class="shop-filter-field">Artist<select name="artist"><option value="">Any artist</option>{% for option in artists %}<option value="{{ option.slug }}"{% if filter_values.artist == option.slug %} selected{% endif %}>{{ option.name }}</option>{% endfor %}</select></label>
+        <label class="shop-filter-field">Room<select name="space"><option value="">Any space</option>{% for option in spaces %}<option value="{{ option }}"{% if filter_values.space == option %} selected{% endif %}>{{ option|title }}</option>{% endfor %}</select></label>
+        <button class="shop-filter-submit" type="submit">Apply filters</button>
+      </form>
+      <a class="archive-link" href="{% url 'gallery:archive' %}">Visit the sold archive <span aria-hidden="true">↗</span></a>
+    </aside>
+    <div class="shop-main">
+      <div class="shop-toolbar"><p>Original works, ready to find their place.</p><label>Sort by <select name="sort" form="shop-filters" data-filter-sort hx-get="{% url 'gallery:shop' %}" hx-trigger="change" hx-target="#shop-results" hx-swap="outerHTML" hx-push-url="true" hx-include="#shop-filters"><option value="featured"{% if filter_values.sort == 'featured' %} selected{% endif %}>Featured</option><option value="best-selling"{% if filter_values.sort == 'best-selling' %} selected{% endif %}>Best selling</option><option value="newest"{% if filter_values.sort == 'newest' %} selected{% endif %}>Newest</option><option value="oldest"{% if filter_values.sort == 'oldest' %} selected{% endif %}>Oldest</option><option value="price-low-high"{% if filter_values.sort == 'price-low-high' %} selected{% endif %}>Price: low to high</option><option value="price-high-low"{% if filter_values.sort == 'price-high-low' %} selected{% endif %}>Price: high to low</option><option value="a-z"{% if filter_values.sort == 'a-z' %} selected{% endif %}>A to Z</option><option value="z-a"{% if filter_values.sort == 'z-a' %} selected{% endif %}>Z to A</option></select></label></div>
+      {% include 'gallery/partials/_shop_results.html' %}
+    </div>
+  </div>
+</section>
+{% endblock %}

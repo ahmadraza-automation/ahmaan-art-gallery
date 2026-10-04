@@ -1,0 +1,22 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="checkout-page">
+  <div class="checkout-heading"><p class="eyebrow"><span class="eyebrow-dot"></span> A considered choice</p><h1>Complete your order.</h1></div>
+  <div class="checkout-layout">
+    <form class="contact-form checkout-form" method="post">
+      {% csrf_token %}
+      <h2>Delivery details</h2>
+      {% for field in form %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>{% endfor %}
+      <fieldset class="payment-choice"><legend>Payment</legend><label><input type="radio" checked disabled> Cash on delivery</label></fieldset>
+      {% if form.non_field_errors %}<div class="field-error">{{ form.non_field_errors }}</div>{% endif %}
+      <button class="button-link" type="submit">Place COD order <span aria-hidden="true">↗</span></button>
+    </form>
+    <aside class="checkout-summary"><p class="eyebrow">Your bag</p><h2>Order summary</h2>
+      {% for line in cart_lines %}<div class="summary-line"><div><strong>{{ line.artwork.title }}</strong><span>{{ line.quantity }} × {{ line.size_label }} · {{ line.frame_label }} frame</span>{% if line.custom_additions %}<small>{{ line.custom_additions }}</small>{% endif %}</div><strong>{% if line.line_total != None %}PKR {{ line.line_total|floatformat:0 }}{% else %}Price on request{% endif %}</strong></div>{% endfor %}
+      <div class="drawer-total"><span>Estimated total</span>{% if cart_has_unpriced %}<strong>Confirmed with gallery</strong>{% else %}<strong>PKR {{ cart_total|floatformat:0 }}</strong>{% endif %}</div>
+      <p class="checkout-note">Your order is confirmed by the gallery before dispatch. WhatsApp will include your items, selected finishes, notes and delivery details.</p>
+    </aside>
+  </div>
+</section>
+{% endblock %}

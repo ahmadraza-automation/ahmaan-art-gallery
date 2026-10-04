@@ -1,0 +1,12 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block meta_description %}{{ seo_description }}{% endblock %}
+{% block content %}
+<section class="room-listing-page">
+  <header class="room-listing-heading">
+    <div><p class="eyebrow">Art for your space</p><h1>{{ room.name }}</h1><p>{{ room.short_description }}</p></div>
+    {% if room.image %}<img src="{{ room.image.url }}" alt="Art selected for the {{ room.name|lower }}" fetchpriority="high">{% endif %}
+  </header>
+  <div class="discovery-page-product-grid">{% for artwork in artworks %}{% include 'gallery/partials/_discovery_product_card.html' %}{% empty %}<p class="content-note">New work for this room is being prepared.</p>{% endfor %}</div>
+</section>
+{% endblock %}

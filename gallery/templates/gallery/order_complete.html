@@ -1,0 +1,12 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="confirmation-page">
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Request received</p>
+  <h1>Thank you, {{ order.customer_name }}.</h1>
+  <p class="confirmation-copy">Your order is recorded. The gallery will confirm availability, custom details and delivery before dispatch.</p>
+  <div class="confirmation-items">{% for item in items %}<article class="summary-line"><div><strong>{{ item.order.requested_title|default:item.order.get_art_category_display }}</strong><span>{{ item.order.quantity }} × {{ item.order.get_size_display }} · {{ item.order.get_frame_display }}</span>{% if item.order.custom_additions %}<small>{{ item.order.custom_additions }}</small>{% endif %}</div><strong>{% if item.line_total != None %}PKR {{ item.line_total|floatformat:0 }}{% else %}Price on request{% endif %}</strong></article>{% endfor %}</div>
+  <dl class="art-facts confirmation-facts"><div><dt>Payment</dt><dd>Cash on delivery</dd></div><div><dt>Deliver to</dt><dd>{{ order.customer_name }} · {{ order.customer_phone }}</dd></div></dl>
+  <div class="confirmation-actions"><a class="button-link" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer">Continue on WhatsApp <span aria-hidden="true">↗</span></a><a class="text-link" href="{% url 'gallery:shop' %}">Back to the gallery <span aria-hidden="true">↗</span></a></div>
+</section>
+{% endblock %}

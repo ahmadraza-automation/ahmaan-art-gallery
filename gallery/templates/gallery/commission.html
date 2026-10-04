@@ -1,0 +1,19 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="contact-page commission-page">
+  <aside class="contact-aside">
+    <p class="eyebrow"><span class="eyebrow-dot"></span> Made around your idea</p>
+    <h1>Art with<br><em>your story in it.</em></h1>
+    <p>Tell us what you have in mind. Request a custom portrait, a new artwork, or thoughtful changes to a piece in the collection. We will contact you to confirm the details and price.</p>
+    <p class="commission-note">Choose a size and frame, describe your additions, and attach a reference image if you have one.</p>
+  </aside>
+  <form class="contact-form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="newsletter-honeypot" aria-hidden="true"><label for="id_website">Leave this field empty</label>{{ form.website }}</div>
+    {% for field in form %}{% if field.name != 'website' %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>{% endif %}{% endfor %}
+    {% if form.non_field_errors %}<div class="field-error">{{ form.non_field_errors }}</div>{% endif %}
+    <button class="button-link" type="submit">Send commission request <span aria-hidden="true">↗</span></button>
+  </form>
+</section>
+{% endblock %}

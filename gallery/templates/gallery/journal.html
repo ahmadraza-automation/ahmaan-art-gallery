@@ -1,0 +1,30 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block structured_data %}<script type="application/ld+json">{{ breadcrumb_jsonld|safe }}</script>{% endblock %}
+{% block content %}
+<section class="content-page journal-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="{% url 'gallery:home' %}">Home</a><span aria-hidden="true">/</span><span aria-current="page">Journal</span></nav>
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Notes from the studio</p>
+  <h1>Journal</h1>
+  <p class="lede">Stories, artist notes, and the gentle rituals behind collecting art.</p>
+
+  <nav class="journal-categories" aria-label="Journal categories"><a href="{% url 'core:journal_index' %}"{% if not active_category %} aria-current="page"{% endif %}>All stories</a>{% for value, label in categories %}<a href="?category={{ value }}"{% if active_category == value %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}</nav>
+  {% include "ads/slot.html" with ad_slot=ad_slot %}
+
+  {% if posts %}
+  <div class="journal-grid">
+    {% for post in posts %}
+    <article class="journal-card">
+      {% if post.cover_image %}<a class="journal-image" href="{% url 'core:journal_detail' post.slug %}"><img src="{{ post.cover_image.url }}" alt="{{ post.title }}" loading="lazy"></a>{% else %}<a class="journal-image journal-image--{{ forloop.counter }}" href="{% url 'core:journal_detail' post.slug %}" aria-label="Read {{ post.title }}"></a>{% endif %}
+      <p class="journal-date"><span>{{ post.get_category_display }}</span> · {{ post.published_at|date:'F j, Y' }} · {{ post.reading_time_minutes }} min read</p>
+      <h2><a href="{% url 'core:journal_detail' post.slug %}">{{ post.title }}</a></h2>
+      <p>{{ post.excerpt }}</p>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="content-note">The journal is quiet for now. New stories will be published soon.</p>
+  {% endif %}
+  {% if page_obj.has_other_pages %}<nav class="journal-pagination" aria-label="Journal pages">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if active_category %}&amp;category={{ active_category }}{% endif %}">Previous</a>{% endif %}<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if active_category %}&amp;category={{ active_category }}{% endif %}">Next</a>{% endif %}</nav>{% endif %}
+</section>
+{% endblock %}

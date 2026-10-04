@@ -1,0 +1,22 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block structured_data %}<script type="application/ld+json">{{ faq_jsonld|safe }}</script><script type="application/ld+json">{{ breadcrumb_jsonld|safe }}</script>{% endblock %}
+{% block content %}
+<section class="content-page support-page faq-page">
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Helpful information</p>
+  <h1>{{ page_title }}</h1>
+  <p class="lede">{{ intro }}</p>
+  {% regroup faq_items by get_category_display as faq_groups %}
+  <div class="faq-groups">
+    {% for group in faq_groups %}<section class="faq-group" aria-labelledby="faq-category-{{ forloop.counter }}">
+      <h2 id="faq-category-{{ forloop.counter }}">{{ group.grouper }}</h2>
+      <div class="faq-accordion">{% for faq in group.list %}
+        <article class="faq-accordion-item" x-data="{ expanded: false }">
+          <h3><button type="button" @click="expanded = !expanded" :aria-expanded="expanded.toString()" aria-controls="faq-answer-{{ faq.pk }}">{{ faq.question }}<span aria-hidden="true" x-text="expanded ? '−' : '+'">{% if forloop.first %}−{% else %}+{% endif %}</span></button></h3>
+          <div class="faq-answer" id="faq-answer-{{ faq.pk }}" x-show="expanded" x-cloak><p>{{ faq.answer|linebreaksbr }}</p></div>
+        </article>
+      {% endfor %}</div>
+    </section>{% empty %}<p class="content-note">We are still preparing the frequently asked questions for this section.</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,143 @@
+.announcement-strip[hidden] {
+  display: none;
+}
+
+.home-order-guide {
+  padding-top: 78px;
+  padding-bottom: 78px;
+}
+
+.home-process-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.home-process-step {
+  position: relative;
+  min-width: 0;
+  padding: 22px 12px 0 0;
+  border-top: 1px solid #c8c8bb;
+}
+
+.home-process-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 24px;
+  place-items: center;
+  color: #25634e;
+  background: #e8eee9;
+}
+
+.home-process-icon svg {
+  width: 27px;
+  height: 27px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+.home-process-number {
+  position: absolute;
+  top: 30px;
+  right: 8px;
+  color: #927b4d;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-process-step h3 {
+  margin: 0 0 8px;
+  color: #F5F3EA;
+  font: 500 21px var(--serif, Georgia, serif);
+}
+
+.home-process-step p {
+  max-width: 240px;
+  margin: 0;
+  color: #D6DDD8;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.home-stats-strip {
+  padding: 34px 7%;
+  color: #fffefa;
+  background: #263a31;
+}
+
+.home-stats-grid {
+  display: grid;
+  max-width: 1320px;
+  margin: 0 auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.home-stat {
+  display: grid;
+  min-width: 0;
+  min-height: 88px;
+  align-content: center;
+  justify-items: center;
+  gap: 5px;
+  padding: 8px 14px;
+  border-right: 1px solid #ffffff38;
+  text-align: center;
+}
+
+.home-stat:last-child {
+  border-right: 0;
+}
+
+.home-stat-value {
+  color: #e6c88a;
+  font: 500 31px var(--serif, Georgia, serif);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-stat span:last-child {
+  color: #f1f0e9;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+@media (max-width: 760px) {
+  .home-order-guide {
+    padding-top: 58px;
+    padding-bottom: 58px;
+  }
+
+  .home-process-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 20px;
+  }
+
+  .home-stats-strip {
+    padding: 20px 6%;
+  }
+
+  .home-stat:nth-child(2) {
+    border-right: 0;
+  }
+
+  .home-stat:nth-child(-n + 2) {
+    border-bottom: 1px solid #ffffff38;
+  }
+}
+
+@media (max-width: 380px) {
+  .home-process-grid {
+    gap: 24px 14px;
+  }
+
+  .home-process-step h3 {
+    font-size: 19px;
+  }
+
+  .home-stat-value {
+    font-size: 28px;
+  }
+}

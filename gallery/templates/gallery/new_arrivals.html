@@ -1,0 +1,12 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block meta_description %}{{ seo_description }}{% endblock %}
+{% block content %}
+<section class="new-arrivals-page">
+  <header class="browse-heading"><p class="eyebrow">Fresh from the studio</p><h1>New Arrivals</h1><p>The latest original work added to the gallery.</p></header>
+  <div class="discovery-page-product-grid">{% for artwork in page_obj %}{% include 'gallery/partials/_discovery_product_card.html' %}{% empty %}<p class="content-note">New work is being prepared for the gallery.</p>{% endfor %}</div>
+  {% if page_obj.paginator.num_pages > 1 %}<nav class="discovery-pagination" aria-label="New arrival pages">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" aria-label="Previous page">← Previous</a>{% endif %}<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" aria-label="Next page">Next →</a>{% endif %}
+  </nav>{% endif %}
+</section>
+{% endblock %}

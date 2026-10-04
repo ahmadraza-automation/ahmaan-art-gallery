@@ -1,0 +1,2 @@
+{% for artwork in page_obj %}{% include 'gallery/partials/_catalog_card.html' %}{% endfor %}
+{% if next_page_url %}<button class="shop-load-more" type="button" data-load-more hx-get="{{ next_page_url }}" hx-target="#shop-grid" hx-swap="beforeend" hx-trigger="revealed">Keep exploring <span aria-hidden="true">↓</span></button>{% endif %}

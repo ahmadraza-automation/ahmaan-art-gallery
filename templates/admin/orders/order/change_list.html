@@ -1,0 +1,11 @@
+{% extends 'admin/change_list.html' %}
+{% load humanize %}
+{% block content %}
+<section class="order-analytics" aria-label="Sales analytics">
+  <div class="order-analytics-stat"><span>Paid revenue</span><strong>PKR {{ sales_analytics.revenue|floatformat:0|intcomma }}</strong></div>
+  <div class="order-analytics-stat"><span>All orders</span><strong>{{ sales_analytics.order_count }}</strong></div>
+  <div class="order-analytics-stat"><span>Pending</span><strong>{{ sales_analytics.pending_count }}</strong></div>
+  <div class="order-analytics-charts"><section><h2>Order status</h2>{% for key, count in sales_analytics.status_counts.items %}<div class="order-status-row"><span>{{ key|title }}</span><span class="order-status-track"><i style="width:{% widthratio count sales_analytics.order_count 100 %}%"></i></span><b>{{ count }}</b></div>{% endfor %}</section><section><h2>Top artworks</h2>{% for item in sales_analytics.top_items %}<div class="order-status-row"><span>{{ item.title_at_order }}</span><b>{{ item.quantity }}</b></div>{% empty %}<p>No order items yet.</p>{% endfor %}</section></div>
+</section>
+{{ block.super }}
+{% endblock %}

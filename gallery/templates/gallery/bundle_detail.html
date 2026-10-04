@@ -1,0 +1,5 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="bundle-detail-page"><a class="back-link" href="{% url 'gallery:shop' %}"><span aria-hidden="true">←</span> Back to the gallery</a><header class="bundle-detail-heading"><p class="eyebrow">Curated set · {{ bundle.bundle_items.count }} original works</p><h1>{{ bundle.name }}</h1><p>{{ bundle.short_description }}</p><div class="bundle-detail-price"><strong>PKR {{ bundle.bundle_price|floatformat:0 }}</strong><del>PKR {{ bundle.individual_total|floatformat:0 }}</del><span>You save PKR {{ bundle.savings|floatformat:0 }}</span></div></header><div class="editorial-art-grid editorial-art-grid--three">{% for item in bundle.bundle_items.all %}{% with artwork=item.artwork %}{% include 'gallery/partials/_catalog_card.html' %}{% endwith %}{% endfor %}</div></section>
+{% endblock %}

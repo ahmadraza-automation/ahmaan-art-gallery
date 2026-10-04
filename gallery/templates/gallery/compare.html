@@ -1,0 +1,17 @@
+{% extends 'gallery/base.html' %}
+{% block title %}Compare Original Artworks | Ahmaan Art Gallery{% endblock %}
+{% block meta_description %}Compare size, medium, price, and artist details for your selected original artworks.{% endblock %}
+{% block content %}
+<section class="compare-page">
+  <header class="browse-heading"><p class="eyebrow">Side by side</p><h1>Compare artworks</h1><p>Choose up to three works to compare their details.</p></header>
+  {% if compare_items %}
+  <div class="compare-table-scroll" id="compare-content"><table class="compare-table"><thead><tr><th scope="col">Details</th>{% for item in compare_items %}<th scope="col"><div class="compare-artwork-heading"><a href="{{ item.url }}">{{ item.title }}</a><form method="post" action="{{ item.toggle_url }}" hx-post="{{ item.toggle_url }}" hx-swap="none">{% csrf_token %}<button class="compare-remove" type="submit" aria-label="Remove {{ item.title }} from compare">×</button></form></div></th>{% endfor %}</tr></thead><tbody>
+    <tr><th scope="row">Artist</th>{% for item in compare_items %}<td>{% if item.artist_url %}<a href="{{ item.artist_url }}">{{ item.artist }}</a>{% else %}{{ item.artist }}{% endif %}</td>{% endfor %}</tr>
+    <tr><th scope="row">Size</th>{% for item in compare_items %}<td>{% if item.width and item.height %}{{ item.width|floatformat:0 }} × {{ item.height|floatformat:0 }} cm{% else %}{{ item.dimensions|default:'Not specified' }}{% endif %}</td>{% endfor %}</tr>
+    <tr><th scope="row">Medium</th>{% for item in compare_items %}<td>{{ item.medium|default:'Not specified' }}</td>{% endfor %}</tr>
+    <tr><th scope="row">Price</th>{% for item in compare_items %}<td>{% if item.price %}PKR {{ item.price|floatformat:0 }}{% else %}Price on request{% endif %}</td>{% endfor %}</tr>
+    <tr><th scope="row">View</th>{% for item in compare_items %}<td><a class="editorial-text-link" href="{{ item.url }}">View artwork <span aria-hidden="true">↗</span></a></td>{% endfor %}</tr>
+  </tbody></table></div>
+  {% else %}<div class="compare-empty"><p>No artworks selected to compare yet.</p><a class="button-link" href="{% url 'gallery:shop' %}">Explore the gallery <span aria-hidden="true">↗</span></a></div>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="contact-page">
+  <div class="contact-aside">
+    <p class="eyebrow">We'd love to hear from you</p>
+    <h1>Let's talk<br><em>about art.</em></h1>
+    <p>Ask us about a work, arrange a viewing, or simply start a conversation. We'll get back to you soon.</p>
+    <div class="contact-note"><span class="note-mark" aria-hidden="true">A</span><span>Ahmaan Art Gallery<br><small>Independent art, thoughtfully found</small></span></div>
+    <div class="contact-meta">
+      <p><strong>Visit</strong><br> Lahore, Pakistan</p>
+      <p><strong>Hours</strong><br> Tue – Sat, 11:00 – 7:00</p>
+      <p><strong>WhatsApp</strong><br><a href="https://wa.me/{{ whatsapp_number|default:'923001234567' }}">Message the gallery</a></p>
+      <p><strong>Need help?</strong><br><a href="{% url 'core:faq' %}">Read the FAQ</a> or <a href="{% url 'core:shipping' %}">shipping details</a></p>
+    </div>
+  </div>
+  <div class="contact-form-wrap">
+    {% if messages %}{% for message in messages %}<div class="success-message" role="status">{{ message }}</div>{% endfor %}{% endif %}
+    <form method="post" class="contact-form">
+      {% csrf_token %}
+      <div class="newsletter-honeypot" aria-hidden="true"><label for="id_website">Leave this field empty</label>{{ form.website }}</div>
+      {% for field in form %}{% if field.name != 'website' %}<div class="form-field{% if field.errors %} has-error{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>{% endif %}{% endfor %}
+      <button class="button-link" type="submit">Send your message <span aria-hidden="true">↗</span></button>
+    </form>
+  </div>
+</section>
+{% endblock %}

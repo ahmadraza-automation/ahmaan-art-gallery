@@ -1,0 +1,35 @@
+{% extends 'gallery/base.html' %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block content %}
+<section class="confirmation-page">
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Order received</p>
+  <h1>Thank you, {{ order.customer_name }}.</h1>
+  <p class="confirmation-copy">Your order <strong>{{ order.reference }}</strong> is recorded. We will confirm your payment and delivery details shortly.</p>
+
+  <div class="confirmation-items">
+    {% for item in items %}
+    <article class="summary-line">
+      <div>
+        <strong>{{ item.title_at_order }}</strong>
+        <span>{{ item.quantity }} × {{ item.chosen_size.name|default:'Standard' }}{% if item.chosen_frame %} · {{ item.chosen_frame.name }}{% endif %}{% if item.chosen_canvas %} · {{ item.chosen_canvas.name }}{% endif %}</span>
+        {% if item.custom_text %}<small>{{ item.custom_text }}</small>{% endif %}
+      </div>
+      <strong>PKR {{ item.line_total|floatformat:0 }}</strong>
+    </article>
+    {% endfor %}
+  </div>
+
+  <dl class="art-facts confirmation-facts">
+    <div><dt>Order status</dt><dd>{{ order.get_status_display }}</dd></div>
+    <div><dt>Payment</dt><dd>{{ order.get_payment_method_display }} · {{ order.get_payment_status_display }}</dd></div>
+    <div><dt>Total</dt><dd>PKR {{ order.total|floatformat:0 }}</dd></div>
+    <div><dt>Deliver to</dt><dd>{{ order.customer_name }} · {{ order.customer_phone }}<br>{{ order.delivery_address }}, {{ order.city }}</dd></div>
+  </dl>
+
+  <div class="confirmation-actions">
+    <a class="button-link" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer">Confirm on WhatsApp <span aria-hidden="true">↗</span></a>
+    <a class="text-link" href="{{ certificate_url }}">View authenticity certificate <span aria-hidden="true">↗</span></a>
+    <a class="text-link" href="{% url 'gallery:shop' %}">Back to the gallery <span aria-hidden="true">↗</span></a>
+  </div>
+</section>
+{% endblock %}

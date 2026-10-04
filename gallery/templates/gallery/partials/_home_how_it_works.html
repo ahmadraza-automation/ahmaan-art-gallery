@@ -1,0 +1,41 @@
+<section class="home-order-guide editorial-section" aria-labelledby="home-order-guide-title">
+  <div class="editorial-section-heading">
+    <div><p class="eyebrow">A thoughtful way to collect</p><h2 id="home-order-guide-title">How It Works</h2></div>
+    <a class="editorial-text-link" href="{% url 'core:shipping_payments' %}">Shipping &amp; payment details <span aria-hidden="true">↗</span></a>
+  </div>
+  <div class="home-process-grid">
+    <article class="home-process-step">
+      <span class="home-process-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="14" cy="14" r="9"></circle><path d="m21 21 6 6M14 9v5l4 2"></path></svg></span>
+      <span class="home-process-number">01</span><h3>Explore</h3><p>Find original work by artists from Pakistan.</p>
+    </article>
+    <article class="home-process-step">
+      <span class="home-process-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M5 11h22l-2 16H7L5 11Z"></path><path d="M11 12V9a5 5 0 0 1 10 0v3"></path></svg></span>
+      <span class="home-process-number">02</span><h3>Order</h3><p>Choose your piece and share your delivery details.</p>
+    </article>
+    <article class="home-process-step">
+      <span class="home-process-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 4 26 8v7c0 6-4 10-10 13C10 25 6 21 6 15V8l10-4Z"></path><path d="m12 16 3 3 6-7"></path></svg></span>
+      <span class="home-process-number">03</span><h3>Secure Payment</h3><p>Pay using the available method that works for you.</p>
+    </article>
+    <article class="home-process-step">
+      <span class="home-process-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M3 9h16v15H3zM19 14h6l4 5v5h-10z"></path><circle cx="9" cy="25" r="2.5"></circle><circle cx="24" cy="25" r="2.5"></circle></svg></span>
+      <span class="home-process-number">04</span><h3>Delivery</h3><p>We carefully pack your art and deliver it to your door.</p>
+    </article>
+  </div>
+</section>
+
+<section class="home-stats-strip" aria-label="The gallery in numbers" x-data="{ counts: { artists: 0, artworks: 0, cities: 0, collectors: 0 }, init() { const targets = Array.from(this.$el.querySelectorAll('[data-stat-target]')).map((item) => [item.dataset.statTarget, Number(item.dataset.count)]); const observer = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting) return; observer.disconnect(); const startedAt = performance.now(); const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1100; if (duration === 0) { targets.forEach(([key, target]) => { this.counts[key] = target; }); return; } const update = (timestamp) => { const progress = Math.min((timestamp - startedAt) / duration, 1); targets.forEach(([key, target]) => { this.counts[key] = Math.round(target * progress); }); if (progress < 1) requestAnimationFrame(update); }; requestAnimationFrame(update); }); observer.observe(this.$el); } }">
+  <div class="home-stats-grid">
+    <article class="home-stat" data-stat-target="artists" data-count="{{ site_settings.homepage_artists_count|default:0 }}">
+      <strong class="home-stat-value" x-text="counts.artists.toLocaleString()">{{ site_settings.homepage_artists_count|default:0 }}</strong><span>Artists</span>
+    </article>
+    <article class="home-stat" data-stat-target="artworks" data-count="{{ site_settings.homepage_artworks_count|default:0 }}">
+      <strong class="home-stat-value" x-text="counts.artworks.toLocaleString()">{{ site_settings.homepage_artworks_count|default:0 }}</strong><span>Artworks</span>
+    </article>
+    <article class="home-stat" data-stat-target="cities" data-count="{{ site_settings.homepage_cities_delivered_count|default:0 }}">
+      <strong class="home-stat-value" x-text="counts.cities.toLocaleString()">{{ site_settings.homepage_cities_delivered_count|default:0 }}</strong><span>Cities delivered</span>
+    </article>
+    <article class="home-stat" data-stat-target="collectors" data-count="{{ site_settings.homepage_happy_collectors_count|default:0 }}">
+      <strong class="home-stat-value" x-text="counts.collectors.toLocaleString()">{{ site_settings.homepage_happy_collectors_count|default:0 }}</strong><span>Happy collectors</span>
+    </article>
+  </div>
+</section>
