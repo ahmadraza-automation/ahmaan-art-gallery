@@ -1,61 +1,190 @@
 # Ahmaan Art Gallery
 
-Ahmaan Art Gallery is a Django art shop for the Pakistani market. The existing `gallery` app continues to run the storefront; the Part 1 domain foundation adds separate `catalog`, `orders`, `commissions`, `accounts`, and `core` apps without discarding existing storefront data. Prices are stored as decimal PKR amounts.
+**Independent Art Platform for Pakistan**  
+Original artworks, commissions, and curated collections — built for collectors across Pakistan with local payment methods and nationwide delivery.
 
-## Local setup
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://python.org)
+[![Django](https://img.shields.io/badge/Django-5.2-green)](https://djangoproject.com)
+[![License](https://img.shields.io/badge/License-Private-red)]()
 
-Use Python 3.10 or newer. From the project directory:
+---
+
+## Overview
+
+Ahmaan Art Gallery is a full-featured Django e-commerce platform specialized for the Pakistani art market. It combines a modern storefront with powerful admin tools for managing original artworks, limited editions, commissions, gift cards, and order fulfillment.
+
+### Key Highlights
+- Designed for **PKR pricing** and local payment methods (COD, Bank Transfer, JazzCash, Easypaisa)
+- Unique **one-of-a-kind artwork reservation** system (24-hour hold)
+- Automatic **Certificate of Authenticity** generation with QR verification
+- Complete order lifecycle with tracking, payment proof review, and WhatsApp integration
+- Light/Dark mode, responsive design, and SEO-ready pages
+
+---
+
+## Features
+
+### Storefront & Catalog
+- Beautiful collection-based browsing (Quiet Landscapes, Letters of Light, Everyday Reverie, Portrait Studies)
+- Artist profiles with interviews and city information
+- Advanced filtering by category, style, subject, price range, and room
+- Artwork detail pages with size, frame, and canvas options
+- Session-based cart + wishlist (works for guests and logged-in users)
+- Hero slides with optional video support
+- Journal / blog section
+- Newsletter subscription & welcome offers
+
+### Orders & Checkout
+- Multi-item cart supporting both catalog and legacy artworks
+- Coupons & Gift Cards (fixed PKR denominations)
+- Payment methods: Cash on Delivery, Bank Transfer, JazzCash, Easypaisa
+- Payment proof upload & admin approval workflow
+- Automatic reservation of unique artworks during checkout
+- Order confirmation with WhatsApp deep-link
+- Order tracking by reference + phone number
+- Order history for authenticated users
+
+### Certificates & Trust
+- Auto-generated PDF Certificate of Authenticity
+- Unique certificate ID + QR code for public verification
+- Public verification page (`/verify/<certificate_id>/`)
+
+### Commissions
+- Custom commission request flow
+- Admin management of commission status and images
+
+### Accounts
+- User profiles with saved addresses
+- Order history and saved preferences
+
+### Admin & Operations
+- Full Django admin with CSV export on key models
+- Sales analytics on order list page
+- Site settings singleton (shipping rates, payment details, announcement bar, social links)
+- Image optimization (WebP + multiple size variants)
+- Seed command for demo data
+
+---
+
+## Tech Stack
+
+| Layer              | Technology                          |
+|--------------------|-------------------------------------|
+| Backend            | Django 5.2                          |
+| Database           | SQLite (dev) / PostgreSQL (prod)    |
+| Image Processing   | Pillow + custom WebP variants       |
+| PDF Certificates   | ReportLab + QRCode                  |
+| Static Files       | WhiteNoise                          |
+| Payments           | Custom providers (COD, Bank, JazzCash, Easypaisa) |
+| Frontend           | Custom CSS + light/dark mode        |
+
+---
+
+## Screenshots
+
+### Homepage Hero
+> "Make room for feeling" — bold hero with original artwork background
+
+### Collections Grid
+> Curated collections: Quiet Landscapes, Letters of Light, Everyday Reverie, Portrait Studies
+
+### How It Works
+> Clear 4-step process: Explore → Order → Secure Payment → Delivery
+
+*(Screenshots available in the project — add them under `docs/screenshots/` for full visual documentation)*
+
+---
+
+## Project Structure
+
+```
+ahmaan-art-gallery/
+├── accounts/          # User profiles & saved addresses
+├── catalog/           # Artworks, artists, collections, categories
+├── commissions/       # Custom commission requests
+├── config/            # Settings (dev/prod), URLs, ASGI/WSGI
+├── core/              # Site settings, journal, testimonials, FAQs, trust features
+├── gallery/           # Legacy storefront (still active)
+├── orders/            # Checkout, payments, certificates, tracking
+├── manage.py
+├── requirements.txt
+└── .env.example
+```
+
+---
+
+## Local Setup
+
+**Requirements:** Python 3.10+
 
 ```powershell
+# 1. Clone & enter project
+git clone https://github.com/ahmadraza-automation/ahmaan-art-gallery.git
+cd ahmaan-art-gallery
+
+# 2. Create virtual environment
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+
+# 3. Install dependencies
 python -m pip install -r requirements.txt
+
+# 4. Environment
 Copy-Item .env.example .env
+# Edit .env and set WHATSAPP_NUMBER, ADMIN_EMAIL, etc.
+
+# 5. Database & seed data
 python manage.py migrate
 python manage.py seed_gallery
 python manage.py createsuperuser
+
+# 6. Run
 python manage.py runserver
 ```
 
-Open `http://127.0.0.1:8000/`; the admin is at `/admin/`. Local development uses SQLite by default. Configure `WHATSAPP_NUMBER` in `.env` using the international number without a leading `+`.
+Open:
+- Storefront → http://127.0.0.1:8000/
+- Admin → http://127.0.0.1:8000/admin/
 
-The journal and artist profiles are managed in the existing admin. Add artist interviews by linking an artist to a published journal entry. Designer inquiries, shipping/payment copy, city delivery estimates, and AdSense placements are also editable in admin. AdSense is off by default; to enable it, set `ADSENSE_ENABLED=True` and `ADSENSE_CLIENT_ID=ca-pub-...`, then add active AdSlot records with the placement keys `journal-list`, `journal-post`, `artist-list`, or `artwork-list`. The AdSense script loads only after optional cookies are accepted. Set `ADMIN_EMAIL` for form notification delivery.
+---
 
-## Data and uploads
+## Production Deployment
 
-`python manage.py seed_gallery` creates or updates five categories, four collections, three artists, and twelve sample catalog artworks. The seed command can be run repeatedly. The current live storefront also has its own legacy sample content; this command seeds the new `catalog` models and does not replace the storefront's existing records.
+Set these environment variables (never commit secrets):
 
-Uploaded model images are converted to WebP and stored with 2400, 1200, 600, and 320 pixel wide variants under `media/`. Variant processing keeps aspect ratio and does not enlarge images smaller than a requested size. Store media on persistent storage in production and configure backups/access controls for customer uploads.
+```
+DJANGO_SETTINGS_MODULE=config.settings_prod
+DJANGO_SECRET_KEY=your-strong-secret
+DJANGO_ALLOWED_HOSTS=yourdomain.com
+DATABASE_URL=postgres://user:password@host:5432/dbname
+```
 
-The new apps expose admin screens for all models. List pages include CSV export; artwork and commission editors have image inlines. Site settings can be edited once as a singleton.
-
-The home page uses catalog artworks, collections, hero slides, artist profiles, Instagram images, testimonials, and journal posts managed in the admin. Add video to a hero slide with its `HeroSlideVideo` inline; use a directly playable MP4/WebM URL and keep the slide image as its poster. `SiteSettings` controls the announcement copy, complimentary-shipping threshold, contact details, and social links. The first-visit popup is edited through `WelcomeOffer`. Newsletter submissions are stored in `NewsletterSubscriber`.
-
-The design system includes a persisted light/dark toggle, responsive collection navigation, reduced-motion-aware reveals, and a local wishlist preview. The catalog and legacy artwork pages both integrate with session carts and the shared payment checkout; wishlist state is available to signed-in collectors and guests.
-
-## PostgreSQL production
-
-Set these environment values in the deployment environment (do not commit secrets): `DJANGO_SETTINGS_MODULE=config.settings_prod`, `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, and `DATABASE_URL` with a PostgreSQL URL such as `postgres://user:password@host:5432/database`. Production settings require PostgreSQL, enable secure cookies and HTTPS redirects, and use WhiteNoise's compressed manifest static storage.
-
-Then run:
+Then:
 
 ```powershell
 python manage.py migrate
 python manage.py collectstatic --noinput
 ```
 
-Set `DJANGO_SECURE_SSL_REDIRECT=False` only when HTTPS is terminated by a trusted proxy that already redirects HTTP. Keep `DEBUG` off in production.
+See `docs/deployment.md` for Railway / VPS guides (Gunicorn + Nginx + HTTPS).
 
-## Production launch guides
+---
 
-See [docs/deployment.md](docs/deployment.md) for Railway and VPS instructions covering Gunicorn, Nginx, PostgreSQL, HTTPS, persistent media, cache setup, and required environment variables. Production must set a non-default `DJANGO_ADMIN_URL`; `/admin/` remains the local-development path.
-
-## Tests
-
-Run the checked-in app test modules explicitly; the bare Django test command does not discover every app test module in this workspace:
+## Running Tests
 
 ```powershell
 python manage.py test catalog.tests core.tests gallery.tests
 python manage.py check
 python manage.py makemigrations --check --dry-run
 ```
+
+---
+
+## License
+
+Private project — All rights reserved.
+
+---
+
+**Built with care for the Pakistani art community.**  
+Developed by [Ahmad Raza](https://github.com/ahmadraza-automation)
