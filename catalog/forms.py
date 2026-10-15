@@ -2,6 +2,11 @@ from django import forms
 
 from .models import ArtworkOffer, NotifyRequest, Review
 
+MAX_REVIEW_PHOTO_SIZE = 8 * 1024 * 1024
+REVIEW_PHOTO_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
+REVIEW_PHOTO_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
+REVIEW_PHOTO_FORMATS = {'JPEG', 'PNG', 'WEBP'}
+
 
 class NotifyRequestForm(forms.ModelForm):
     class Meta:
@@ -34,8 +39,13 @@ class ReviewForm(forms.ModelForm):
 
     def clean_photo(self):
         photo = self.cleaned_data.get('photo')
-        if photo and photo.size > 5 * 1024 * 1024:
-            raise forms.ValidationError('Review photos must be 5 MB or smaller.')
+        if photo and photo.size > MAX_REVIEW_PHOTO_SIZE:
+            raise forms.ValidationError('Review photos must be 8 MB or smaller.')
+        if photo:
+            extension = photo.name.rsplit('.', 1)[-1].lower() if '.' in photo.name else ''
+            image_format = getattr(getattr(photo, 'image', None), 'format', None)
+            if extension not in REVIEW_PHOTO_EXTENSIONS or photo.content_type not in REVIEW_PHOTO_TYPES or image_format not in REVIEW_PHOTO_FORMATS:
+                raise forms.ValidationError('Upload a JPG, JPEG, PNG, or WebP review photo.')
         return photo
 
 

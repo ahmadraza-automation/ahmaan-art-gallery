@@ -14,16 +14,16 @@
     <div class="catalog-product-info">
       <p class="eyebrow">{{ artwork.category.name }}{% if artwork.year %} · {{ artwork.year }}{% endif %}</p>
       <h1>{{ artwork.title }}</h1><p class="product-tagline">{{ artwork.mood_tagline }}</p>
-      <p class="product-artist-line">By <a href="{% url 'gallery:artist_detail' artwork.artist.slug %}">{{ artwork.artist.name }}</a> · {{ artwork.artist.specialty }}</p>
+      {% if artwork.category.group != 'accessories' %}<p class="product-artist-line">By <a href="{% url 'gallery:artist_detail' artwork.artist.slug %}">{{ artwork.artist.name }}</a> · {{ artwork.artist.specialty }}</p>{% endif %}
       <div class="product-discovery-actions">
         <form class="product-wishlist-form" method="post" action="{% url 'gallery:wishlist_toggle' artwork.pk %}" hx-post="{% url 'gallery:wishlist_toggle' artwork.pk %}" hx-swap="none" data-wishlist-form>{% csrf_token %}<button class="heart-button" type="submit" data-wishlist-toggle data-wishlist-kind="catalog" data-artwork-id="{{ artwork.pk }}" data-artwork-title="{{ artwork.title }}" aria-label="{% if artwork.pk in wishlist_ids %}Remove{% else %}Save{% endif %} {{ artwork.title }} {% if artwork.pk in wishlist_ids %}from{% else %}to{% endif %} wishlist" aria-pressed="{% if artwork.pk in wishlist_ids %}true{% else %}false{% endif %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.1-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.7A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.6Z"/></svg><span>Save</span></button></form>
         <form class="product-compare-form" method="post" action="{% url 'gallery:compare_toggle' artwork.pk %}" hx-post="{% url 'gallery:compare_toggle' artwork.pk %}" hx-swap="none">{% csrf_token %}<button class="compare-toggle" type="submit" data-compare-toggle data-artwork-type="catalog" data-artwork-id="{{ artwork.pk }}" data-artwork-title="{{ artwork.title }}" aria-label="{% if artwork.pk in compare_ids %}Remove{% else %}Add{% endif %} {{ artwork.title }} {% if artwork.pk in compare_ids %}from{% else %}to{% endif %} compare" aria-pressed="{% if artwork.pk in compare_ids %}true{% else %}false{% endif %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Compare</span></button></form>
       </div>
       {% if average_rating %}<div class="product-rating"><span aria-label="Rated {{ average_rating|floatformat:1 }} out of 5">★★★★★</span> {{ average_rating|floatformat:1 }} · {{ approved_reviews|length }} reviews</div>{% endif %}
       <p class="product-story">{{ artwork.story }}</p>
-      <dl class="product-facts"><div><dt>Medium</dt><dd>{{ artwork.medium }}</dd></div>{% if artwork.width and artwork.height %}<div><dt>Dimensions</dt><dd>{{ artwork.width }} × {{ artwork.height }} cm</dd></div>{% endif %}{% if artwork.year %}<div><dt>Year</dt><dd>{{ artwork.year }}</dd></div>{% endif %}<div><dt>Artist</dt><dd><a href="{% url 'gallery:artist_detail' artwork.artist.slug %}">{{ artwork.artist.name }}</a></dd></div></dl>
+      <dl class="product-facts"><div><dt>{% if artwork.category.group == 'accessories' %}Material{% else %}Medium{% endif %}</dt><dd>{{ artwork.medium }}</dd></div>{% if artwork.width and artwork.height %}<div><dt>Dimensions</dt><dd>{{ artwork.width }} × {{ artwork.height }} cm</dd></div>{% endif %}{% if artwork.year %}<div><dt>Year</dt><dd>{{ artwork.year }}</dd></div>{% endif %}{% if artwork.category.group != 'accessories' %}<div><dt>Artist</dt><dd><a href="{% url 'gallery:artist_detail' artwork.artist.slug %}">{{ artwork.artist.name }}</a></dd></div>{% endif %}</dl>
       <div class="product-tag-lists"><div><span>Palette</span>{% for tag in artwork.color_palette_tags %}<span class="product-tag">{{ tag }}</span>{% endfor %}</div><div><span>Mood</span>{% for tag in artwork.mood_tags %}<span class="product-tag">{{ tag }}</span>{% endfor %}</div></div>
-      {% if artwork.is_limited_edition and artwork.edition_size %}<p class="edition-counter">{{ artwork.remaining|default:0 }} of {{ artwork.edition_size }} remaining</p>{% elif artwork.is_one_of_a_kind %}<p class="edition-counter">One of a kind · original work</p>{% endif %}
+      {% if artwork.category.group != 'accessories' and artwork.is_limited_edition and artwork.edition_size %}<p class="edition-counter">{{ artwork.remaining|default:0 }} of {{ artwork.edition_size }} remaining</p>{% elif artwork.category.group != 'accessories' and artwork.is_one_of_a_kind %}<p class="edition-counter">One of a kind · original work</p>{% endif %}
       {% if artwork.status == 'available' %}
       <form class="catalog-customization" method="post" action="{% url 'gallery:catalog_add' artwork.slug %}" data-product-options data-base-price="{{ artwork.base_price }}">
         {% csrf_token %}<p class="eyebrow">Make it yours</p><h2>Choose your finish</h2>
@@ -34,15 +34,15 @@
         <p class="product-live-price" data-live-price>PKR {{ artwork.base_price|floatformat:0 }}</p>
         <button class="button-link" type="submit">Add to bag <span aria-hidden="true">↗</span></button>
       </form>
-      <button class="secondary-button offer-open-button" type="button" onclick="document.getElementById('artwork-offer-dialog').showModal();">Make an Offer</button>
-      <dialog class="artwork-offer-dialog" id="artwork-offer-dialog" aria-labelledby="artwork-offer-title">
+      {% if artwork.category.group != 'accessories' %}<button class="secondary-button offer-open-button" type="button" onclick="document.getElementById('artwork-offer-dialog').showModal();">Make an Offer</button>{% endif %}
+      {% if artwork.category.group != 'accessories' %}<dialog class="artwork-offer-dialog" id="artwork-offer-dialog" aria-labelledby="artwork-offer-title">
         <form class="contact-form" method="post" action="{% url 'gallery:catalog_offer' artwork.slug %}">
           {% csrf_token %}
           <div class="panel-heading"><div><p class="eyebrow">A private offer</p><h2 id="artwork-offer-title">Make an offer</h2></div><button class="panel-close" type="button" onclick="this.closest('dialog').close();" aria-label="Close offer form">×</button></div>
           {% for field in offer_form %}{% if field.is_hidden %}{{ field }}{% else %}<label class="form-field"><span>{{ field.label }}</span>{{ field }}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>{% endif %}{% endfor %}
           <button class="button-link" type="submit">Send offer <span aria-hidden="true">↗</span></button>
         </form>
-      </dialog>
+      </dialog>{% endif %}
       {% elif artwork.status == 'sold' %}
       <p class="product-sold-note">This original has found a home.</p>
       <form id="notify-form" class="notify-form" method="post" enctype="multipart/form-data">{% csrf_token %}<input type="hidden" name="action" value="notify"><p class="eyebrow">Stay in the loop</p><h2>Notify me of similar works</h2><label class="product-option">Contact me by{{ notify_form.channel }}</label><label class="product-option">Email{{ notify_form.email }}</label><label class="product-option">WhatsApp{{ notify_form.whatsapp }}</label>{% for error in notify_form.non_field_errors %}<small class="field-error">{{ error }}</small>{% endfor %}<button class="button-link" type="submit">Request a notification <span aria-hidden="true">↗</span></button></form>

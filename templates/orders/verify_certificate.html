@@ -1,0 +1,16 @@
+{% extends 'gallery/base.html' %}
+{% block title %}Certificate Verification{% endblock %}
+{% block content %}
+<section class="confirmation-page">
+  <p class="eyebrow"><span class="eyebrow-dot"></span> Certificate verification</p>
+  <h1>Certificate verified.</h1>
+  <p class="confirmation-copy">This certificate confirms the original artwork listed below.</p>
+  <dl class="art-facts confirmation-facts">
+    <div><dt>Certificate ID</dt><dd>{{ certificate_id }}</dd></div>
+    <div><dt>Order reference</dt><dd>{{ order_reference }}</dd></div>
+    <div><dt>Issue date</dt><dd>{{ issued_at|date:'j F Y' }}</dd></div>
+  </dl>
+  <h2>Original works</h2>
+  <ul>{% for title in original_titles %}<li>{{ title }}</li>{% empty %}<li>No original works are listed on this certificate.</li>{% endfor %}</ul>
+</section>
+{% endblock %}

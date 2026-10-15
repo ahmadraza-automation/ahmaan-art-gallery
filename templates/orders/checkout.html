@@ -3,7 +3,7 @@
 {% block title %}{{ seo_title }}{% endblock %}
 {% block content %}
 <section class="checkout-page part4-checkout">
-  <header class="checkout-heading"><p class="eyebrow">A little closer to home</p><h1>Complete your order</h1><p class="delivery-estimate">Estimated delivery: {{ delivery_start|date:'M j' }}–{{ delivery_end|date:'M j, Y' }}</p></header>
+  <header class="checkout-heading"><p class="eyebrow">A little closer to home</p><h1>Complete your order</h1><p class="delivery-estimate">{% if site_settings.delivery_estimate_text %}{{ site_settings.delivery_estimate_text }} · {% endif %}Estimated delivery: {{ delivery_start|date:'M j' }}–{{ delivery_end|date:'M j, Y' }}</p></header>
   {% include 'gallery/partials/_payment_methods.html' %}
   <div class="checkout-layout">
     <form class="contact-form checkout-form" method="post" enctype="multipart/form-data" id="part4-checkout-form">
@@ -16,10 +16,10 @@
         {% for radio in form.payment_method %}<label class="payment-option-card">
           {{ radio.tag }}
           <span class="payment-option-copy"><strong>{{ radio.choice_label }}</strong>
-            {% if radio.data.value == 'cod' %}<small>Pay cash when your order is delivered.</small>
+            {% if radio.data.value == 'cod' %}<small>{% firstof site_settings.cod_description 'Pay cash when your order is delivered.' %}</small>
             {% elif radio.data.value == 'bank_transfer' %}<small>Transfer to the gallery bank account; details appear when selected.</small>
-            {% elif radio.data.value == 'jazzcash' %}<small>Pay through JazzCash; instructions appear when selected.</small>
-            {% elif radio.data.value == 'easypaisa' %}<small>Pay through Easypaisa; instructions appear when selected.</small>
+            {% elif radio.data.value == 'jazzcash' %}<small>{% firstof site_settings.jazzcash_description 'Pay through JazzCash; instructions appear when selected.' %}</small>
+            {% elif radio.data.value == 'easypaisa' %}<small>{% firstof site_settings.easypaisa_description 'Pay through Easypaisa; instructions appear when selected.' %}</small>
             {% else %}<small>The gallery will confirm payment details with your order.</small>{% endif %}
           </span>
         </label>{% endfor %}

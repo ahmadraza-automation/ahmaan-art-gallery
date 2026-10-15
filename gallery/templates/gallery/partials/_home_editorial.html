@@ -1,10 +1,10 @@
-{% load static %}
+{% load static image_tags %}
 <section class="homepage-hero" data-hero-slider aria-label="Featured gallery stories">
   {% for slide in hero_slides %}
   <article class="hero-slide{% if forloop.first %} is-active{% endif %}" data-hero-slide{% if not forloop.first %} hidden{% endif %}>
     {% if slide.video_media.is_enabled and slide.video_media.video_url %}
     <video class="hero-media" autoplay muted loop playsinline poster="{{ slide.image.url }}" aria-label="{{ slide.title }}"><source src="{{ slide.video_media.video_url }}"></video>
-    {% else %}<img class="hero-media" src="{{ slide.image.url }}" alt="" fetchpriority="high">{% endif %}
+    {% else %}<img class="hero-media" src="{{ slide.image.url }}"{% with candidates=slide.image|responsive_srcset %}{% if candidates %} srcset="{{ candidates }}" sizes="100vw"{% endif %}{% endwith %} alt=""{% if forloop.first %} fetchpriority="high"{% else %} fetchpriority="low"{% endif %}>{% endif %}
     <div class="hero-shade"></div>
     <div class="hero-copy"><p class="eyebrow hero-eyebrow">Ahmaan Art Gallery · Lahore</p><h1>{{ slide.title }}</h1>{% if slide.subtitle %}<p>{{ slide.subtitle }}</p>{% endif %}<a class="hero-cta" href="{{ slide.button_url|default:'/shop/' }}">{{ slide.button_text|default:'Explore the collection' }} <span aria-hidden="true">↗</span></a></div>
   </article>

@@ -6,8 +6,8 @@
   <h1>A gallery for art<br><em>that feels personal.</em></h1>
   <div class="about-copy">
     {% if artist_profile.artist_background %}<p>{{ artist_profile.artist_background|linebreaksbr }}</p>{% endif %}
-    <p>Ahmaan Art Gallery brings original artwork and the people who connect with it a little closer. Our collection spans oil painting, calligraphy, digital art and handmade sketches, with custom portraits and commissions made around your ideas.</p>
-    <p>{% if artist_profile.gallery_ethos %}{{ artist_profile.gallery_ethos|linebreaksbr }}{% else %}We believe choosing art should feel considered, not complicated. Every piece has room for a conversation, whether you are looking for a finished work, a different size or frame, or a new piece created just for you.{% endif %}</p>
+    {% if site_settings.about_description %}<p>{{ site_settings.about_description|linebreaksbr }}</p>{% else %}<p>Ahmaan Art Gallery brings original artwork and the people who connect with it a little closer. Our collection spans oil painting, calligraphy, digital art and handmade sketches, with custom portraits and commissions made around your ideas.</p>{% endif %}
+    <p>{% if site_settings.mission_text %}{{ site_settings.mission_text|linebreaksbr }}{% elif artist_profile.gallery_ethos %}{{ artist_profile.gallery_ethos|linebreaksbr }}{% else %}We believe choosing art should feel considered, not complicated. Every piece has room for a conversation, whether you are looking for a finished work, a different size or frame, or a new piece created just for you.{% endif %}</p>
     <div class="content-actions">
       <a class="button-link" href="{% url 'gallery:shop' %}">Explore the gallery <span aria-hidden="true">↗</span></a>
       <a class="button-link button-link--secondary" href="{% url 'gallery:commission' %}">Book a custom piece <span aria-hidden="true">↗</span></a>
@@ -18,12 +18,12 @@
     <article>
       <p class="eyebrow">Our process</p>
       <h2>Slowly chosen, carefully handled.</h2>
-      <p>Every work is selected for its mood, materiality, and the emotional life it brings to a room. We aim to keep collecting personal, transparent, and considered.</p>
+      <p>{% firstof site_settings.process_text 'Every work is selected for its mood, materiality, and the emotional life it brings to a room. We aim to keep collecting personal, transparent, and considered.' %}</p>
     </article>
     <article>
       <p class="eyebrow">Our promise</p>
       <h2>Art that feels lived with.</h2>
-      <p>From first enquiry to final delivery, we keep the experience warm and clear so a work feels like a thoughtful addition, not a transaction.</p>
+      <p>{% firstof site_settings.promise_text 'From first enquiry to final delivery, we keep the experience warm and clear so a work feels like a thoughtful addition, not a transaction.' %}</p>
     </article>
   </div>
 </section>

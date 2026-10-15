@@ -3,6 +3,11 @@ from django.contrib.auth import get_user_model
 
 from .models import ArtworkCategory, ContactInquiry, Order
 
+MAX_PUBLIC_IMAGE_UPLOAD_SIZE = 8 * 1024 * 1024
+PUBLIC_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
+PUBLIC_IMAGE_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
+PUBLIC_IMAGE_FORMATS = {'JPEG', 'PNG', 'WEBP'}
+
 
 class ContactInquiryForm(forms.ModelForm):
     website = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'honeypot-field', 'tabindex': '-1', 'autocomplete': 'off'}))
@@ -43,8 +48,13 @@ class CommissionRequestForm(forms.ModelForm):
 
     def clean_client_image(self):
         image = self.cleaned_data.get('client_image')
-        if image and image.size > 5 * 1024 * 1024:
-            raise forms.ValidationError('Reference images must be 5 MB or smaller.')
+        if image and image.size > MAX_PUBLIC_IMAGE_UPLOAD_SIZE:
+            raise forms.ValidationError('Reference images must be 8 MB or smaller.')
+        if image:
+            extension = image.name.rsplit('.', 1)[-1].lower() if '.' in image.name else ''
+            image_format = getattr(getattr(image, 'image', None), 'format', None)
+            if extension not in PUBLIC_IMAGE_EXTENSIONS or image.content_type not in PUBLIC_IMAGE_TYPES or image_format not in PUBLIC_IMAGE_FORMATS:
+                raise forms.ValidationError('Upload a JPG, JPEG, PNG, or WebP reference image.')
         return image
 
     class Meta:

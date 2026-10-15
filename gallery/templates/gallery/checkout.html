@@ -8,7 +8,7 @@
       {% csrf_token %}
       <h2>Delivery details</h2>
       {% for field in form %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>{% endfor %}
-      <fieldset class="payment-choice"><legend>Payment</legend><label><input type="radio" checked disabled> Cash on delivery</label></fieldset>
+      <fieldset class="payment-choice"><legend>Payment</legend><label><input type="radio" checked disabled> Cash on delivery</label>{% if site_settings.cod_description %}<small>{{ site_settings.cod_description|linebreaksbr }}</small>{% endif %}</fieldset>
       {% if form.non_field_errors %}<div class="field-error">{{ form.non_field_errors }}</div>{% endif %}
       <button class="button-link" type="submit">Place COD order <span aria-hidden="true">↗</span></button>
     </form>

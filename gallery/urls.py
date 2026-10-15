@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 
-from core.security import rate_limit
+from core.security import auth_attempt_limit
 from . import catalog_views, views
 
 app_name = 'gallery'
@@ -41,6 +41,18 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('accounts/signup/', views.signup, name='signup'),
-    path('accounts/login/', rate_limit(5, period=300)(catalog_views.GalleryLoginView.as_view(template_name='registration/login.html')), name='login'),
+    path('accounts/login/', auth_attempt_limit(catalog_views.GalleryLoginView.as_view(template_name='registration/login.html'), identifier_field='username', failed_only=True), name='login'),
+    path('accounts/password_reset/', auth_attempt_limit(auth_views.PasswordResetView.as_view(
+        template_name='gallery/security/password_reset_form.html',
+        email_template_name='registration/gallery_password_reset_email.txt',
+        subject_template_name='registration/gallery_password_reset_subject.txt',
+        success_url='/accounts/password_reset/done/',
+    ), identifier_field='email'), name='password_reset'),
+    path('accounts/password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='gallery/security/password_reset_done.html'), name='password_reset_done'),
+    path('accounts/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
+        template_name='gallery/security/password_reset_confirm.html',
+        success_url='/accounts/reset/done/',
+    ), name='password_reset_confirm'),
+    path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='gallery/security/password_reset_complete.html'), name='password_reset_complete'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]

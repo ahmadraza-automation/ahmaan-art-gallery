@@ -24,9 +24,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'gallery/css/site.css' %}?v=ui-fixes-3">
-  <link rel="stylesheet" href="{% static 'gallery/css/editorial.css' %}?v=ui-fixes-3">
+  <link rel="stylesheet" href="{% static 'gallery/css/editorial.css' %}?v=ui-fixes-4">
   <link rel="stylesheet" href="{% static 'gallery/css/catalog.css' %}">
-  <link rel="stylesheet" href="{% static 'gallery/css/trust.css' %}?v=ui-fixes-3">
+  <link rel="stylesheet" href="{% static 'gallery/css/trust.css' %}?v=ui-fixes-4">
   <link rel="stylesheet" href="{% static 'gallery/css/home-additions.css' %}">
 </head>
 <body{% if request.resolver_match.url_name == 'checkout' or request.resolver_match.url_name == 'confirmation' or request.resolver_match.url_name == 'checkout_complete' or request.resolver_match.url_name == 'order_complete' or request.resolver_match.url_name == 'track' or request.resolver_match.url_name == 'verify_certificate' or request.resolver_match.url_name == 'certificate_download' %} class="commerce-payment-page"{% endif %}>
@@ -34,9 +34,9 @@
     {% for announcement in announcement_messages %}<span data-announcement{% if not forloop.first %} hidden{% endif %}>{{ announcement }}</span>{% endfor %}
   </div>
   <header class="site-header editorial-header">
-    <a class="wordmark" href="{% url 'gallery:home' %}" aria-label="Ahmaan Art Gallery home">
-      <span class="wordmark-mark" aria-hidden="true">A.</span>
-      <span class="wordmark-copy">Ahmaan <span class="wordmark-light">Art Gallery</span></span>
+    <a class="wordmark" href="{% url 'gallery:home' %}" aria-label="{% firstof site_settings.gallery_name 'Ahmaan Art Gallery' %} home">
+      {% if site_settings.logo %}<img src="{{ site_settings.logo.url }}" alt="{% firstof site_settings.gallery_name 'Ahmaan Art Gallery' %}" class="wordmark-logo">{% else %}<span class="wordmark-mark" aria-hidden="true">A.</span>{% endif %}
+      <span class="wordmark-copy"><span class="wordmark-name">{% firstof site_settings.gallery_name 'Ahmaan' %}</span><span class="wordmark-light">{% if site_settings.gallery_name and ' ' in site_settings.gallery_name %}{% else %}Art Gallery{% endif %}</span></span>
     </a>
     <button class="mobile-menu-toggle" type="button" data-mobile-menu-toggle aria-expanded="false" aria-controls="main-navigation" aria-label="Open navigation menu">
       <span></span><span></span>
@@ -44,7 +44,7 @@
     <nav class="main-nav" id="main-navigation" aria-label="Main navigation">
       <a href="{% url 'gallery:shop' %}">Artworks</a>
       <details class="nav-mega">
-        <summary>Collections <span aria-hidden="true">⌄</span></summary>
+        <summary>Collections</summary>
         <div class="mega-menu">
           <div class="mega-collections">
             <p class="eyebrow">Explore by collection</p>
@@ -67,10 +67,36 @@
           </div>
         </div>
       </details>
+      <details class="nav-mega">
+        <summary>Shop</summary>
+        <div class="mega-menu">
+          <div class="mega-collections">
+            <p class="eyebrow">Explore by group</p>
+            <a class="mega-feature-link" href="{% url 'gallery:shop' %}"><span>Paintings</span><small>Original works</small></a>
+            <a class="mega-feature-link" href="{% url 'gallery:shop' %}?group=accessories"><span>Home Accessories</span><small>Decor and lighting</small></a>
+          </div>
+          <div class="mega-featured">
+            <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:4px 14px;">
+              <div>
+                <p class="eyebrow">Paintings</p>
+                {% for category in nav_categories_paintings %}
+                <a class="mega-feature-link" href="{% url 'gallery:shop' %}?category={{ category.slug }}"><span>{{ category.name }}</span></a>
+                {% empty %}<a class="mega-feature-link" href="{% url 'gallery:shop' %}"><span>Discover the collection</span></a>{% endfor %}
+              </div>
+              <div>
+                <p class="eyebrow">Home Accessories</p>
+                {% for category in nav_categories_accessories %}
+                <a class="mega-feature-link" href="{% url 'gallery:shop' %}?category={{ category.slug }}"><span>{{ category.name }}</span></a>
+                {% empty %}<a class="mega-feature-link" href="{% url 'gallery:shop' %}?group=accessories"><span>Discover the collection</span></a>{% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
       <a href="{% url 'gallery:commission' %}">Commissions</a>
       <a href="{% url 'gallery:artists' %}">Artists</a>
-      <a href="{% url 'core:for_designers' %}">For designers</a>
-      <a href="{% url 'gallery:about' %}">Our story</a>
+      <a href="{% url 'core:for_designers' %}">Designers</a>
+      <a href="{% url 'gallery:about' %}">Our Story</a>
     </nav>
     <div class="header-actions editorial-header-actions">
       <button class="icon-action" type="button" data-open-panel="search-panel" aria-label="Search artwork" title="Search">
@@ -148,17 +174,17 @@
   <footer class="site-footer">
     <div class="footer-main">
       <div class="footer-brand-column">
-        <a class="footer-name" href="{% url 'gallery:home' %}">Ahmaan Art Gallery</a>
-        <p>Art to live with, and live around.</p>
-        {% if whatsapp_number %}<a class="footer-whatsapp" href="https://wa.me/{{ whatsapp_number }}">WhatsApp the gallery <span aria-hidden="true">↗</span></a>{% else %}<a class="footer-whatsapp" href="{% url 'gallery:contact' %}">Message the gallery <span aria-hidden="true">↗</span></a>{% endif %}
-        <a href="mailto:hello@ahmaanartgallery.pk">hello@ahmaanartgallery.pk</a>
+        <a class="footer-name" href="{% url 'gallery:home' %}">{% firstof site_settings.gallery_name 'Ahmaan Art Gallery' %}</a>
+        <p>{% firstof site_settings.tagline 'Art to live with, and live around.' %}</p>
+        {% if whatsapp_number %}<a class="footer-whatsapp" href="https://wa.me/{{ whatsapp_number }}">WhatsApp the gallery <span aria-hidden="true">↗</span></a>{% endif %}
+        <a href="mailto:{% firstof site_settings.footer_email 'hello@ahmaanartgallery.pk' %}">{% firstof site_settings.footer_email 'hello@ahmaanartgallery.pk' %}</a>
         {% if site_settings.address %}<address>{{ site_settings.address }}</address>{% endif %}
         {% if site_settings.opening_hours %}<small>{{ site_settings.opening_hours }}</small>{% endif %}
       </div>
       <div class="footer-link-column"><h2>Discover</h2><a href="{% url 'gallery:shop' %}">All artworks</a><a href="{% url 'gallery:commission' %}">Custom commissions</a><a href="{% url 'core:quiz' %}">Art match quiz</a><a href="{% url 'orders:gift_cards' %}">Gift cards</a><a href="{% url 'gallery:about' %}">Our story</a><a href="{% url 'gallery:contact' %}">Visit &amp; contact</a></div>
       <div class="footer-link-column"><h2>Collections</h2>{% for collection in nav_collections|slice:':4' %}<a href="{% url 'gallery:shop' %}#collection">{{ collection.name }}</a>{% empty %}<a href="{% url 'gallery:shop' %}">Browse all work</a>{% endfor %}<a href="{% url 'core:shipping' %}">Delivery &amp; care</a><a href="{% url 'core:returns' %}">Returns &amp; exchanges</a><a href="{% url 'core:privacy' %}">Privacy</a></div>
-      <div class="footer-newsletter"><p class="eyebrow">Notes from the gallery</p><h2>A little art in your inbox.</h2><p>New work, studio stories, and thoughtful things to keep.</p>{% include 'gallery/partials/_newsletter_form.html' with form_id='newsletter-footer' %}
-        <div class="footer-socials" aria-label="Social media">{% if site_settings.instagram_url %}<a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a>{% endif %}{% if site_settings.facebook_url %}<a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a>{% endif %}{% if site_settings.pinterest_url %}<a href="{{ site_settings.pinterest_url }}" target="_blank" rel="noopener">Pinterest</a>{% endif %}</div>
+      <div class="footer-newsletter"><p class="eyebrow">{% firstof site_settings.footer_newsletter_heading 'Notes from the gallery' %}</p><h2>{% firstof site_settings.footer_newsletter_text 'A little art in your inbox.' %}</h2><p>{% firstof site_settings.footer_newsletter_text 'New work, studio stories, and thoughtful things to keep.' %}</p>{% include 'gallery/partials/_newsletter_form.html' with form_id='newsletter-footer' %}
+        <div class="footer-socials" aria-label="Social media">{% if site_settings.instagram_url %}<a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a>{% endif %}{% if site_settings.facebook_url %}<a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a>{% endif %}{% if site_settings.pinterest_url %}<a href="{{ site_settings.pinterest_url }}" target="_blank" rel="noopener">Pinterest</a>{% endif %}{% if site_settings.youtube_url %}<a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener">YouTube</a>{% endif %}{% if site_settings.tiktok_url %}<a href="{{ site_settings.tiktok_url }}" target="_blank" rel="noopener">TikTok</a>{% endif %}</div>
       </div>
     </div>
     <div class="footer-bottom"><span>© {% now 'Y' %} Ahmaan Art Gallery · Lahore, Pakistan</span><div class="footer-legal-links"><a href="{% url 'core:journal_index' %}">Journal</a><a href="{% url 'core:faq' %}">FAQ</a><a href="{% url 'gallery:about' %}">About</a><a href="{% url 'gallery:contact' %}">Contact</a><a href="{% url 'core:privacy' %}">Privacy Policy</a><a href="{% url 'core:terms' %}">Terms</a><a href="{% url 'core:cookie_policy' %}">Cookie Policy</a><a href="{% url 'core:shipping_payments' %}">Shipping &amp; Payments</a><a href="{% url 'gallery:artists' %}">Our Artists</a><button type="button" data-cookie-settings>Cookie settings</button></div>{% include 'gallery/partials/_payment_badges.html' %}</div>
@@ -171,11 +197,11 @@
     {% include 'gallery/partials/_newsletter_form.html' with form_id='newsletter-welcome' submit_label=welcome_offer.button_text %}
   </dialog>
   {% endif %}
-  <button class="discount-tab" type="button" onclick="document.getElementById('discount-offer-dialog').showModal();" aria-label="Get 10% off">Get 10% Off</button>
+  <button class="discount-tab" type="button" onclick="document.getElementById('discount-offer-dialog').showModal();" aria-label="{% firstof site_settings.offer_tab_label 'Get 10% off' %}">{% firstof site_settings.offer_tab_label 'Get 10% Off' %}</button>
   <dialog class="discount-offer-dialog" id="discount-offer-dialog" aria-labelledby="discount-offer-title">
     <form class="contact-form" method="post" action="{% url 'core:newsletter_signup' %}">
       {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><input type="hidden" name="discount_popup" value="1">
-      <div class="panel-heading"><div><p class="eyebrow">A little thank you</p><h2 id="discount-offer-title">Get 10% off your first order</h2></div><button class="panel-close" type="button" onclick="this.closest('dialog').close();" aria-label="Close discount offer">×</button></div>
+      <div class="panel-heading"><div><p class="eyebrow">A little thank you</p><h2 id="discount-offer-title">{% firstof site_settings.offer_dialog_heading 'Get 10% off your first order' %}</h2></div><button class="panel-close" type="button" onclick="this.closest('dialog').close();" aria-label="Close discount offer">×</button></div>
       <p class="panel-hint">Join the newsletter and we’ll send a unique, one-time code.</p>
       <label class="form-field"><span>Email</span><input type="email" name="email" required autocomplete="email" maxlength="254"></label>
       <div class="newsletter-honeypot" aria-hidden="true"><label for="discount-website">Leave this field empty</label><input id="discount-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
@@ -186,7 +212,7 @@
     <div><strong>Cookie choices</strong><p>Essential cookies keep the gallery working. Optional advertising cookies are used only with your consent. <a href="{% url 'core:cookie_policy' %}">Cookie Policy</a></p></div>
     <div class="cookie-consent-actions"><button type="button" data-cookie-choice="rejected">Reject optional</button><button type="button" data-cookie-choice="accepted">Accept optional</button></div>
   </aside>
-  <a class="whatsapp-float" href="https://wa.me/{{ whatsapp_number|default:'' }}?text=Hello%2C%20I%20would%20like%20help%20choosing%20an%20artwork." target="_blank" rel="noopener" aria-label="Chat with the gallery on WhatsApp" title="Chat with the gallery on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 11.7a8.2 8.2 0 0 1-12.1 7.2L4 20l1.1-3.9a8.2 8.2 0 1 1 15.1-4.4Z"></path><path d="M9 8.3c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l.7 1.6c.1.3.1.5-.1.7l-.5.6c-.2.2-.2.4 0 .6.5.8 1.2 1.4 2 1.8.2.1.4.1.6-.1l.7-.8c.2-.2.4-.3.7-.2l1.5.7c.3.1.4.3.4.5 0 .4-.2 1-.6 1.3-.4.4-1 .6-1.6.5-1-.1-2.1-.6-3.2-1.5-1-.8-1.8-1.8-2.2-2.8-.4-.9-.4-1.7-.1-2.3Z"></path></svg></a>
+  {% if whatsapp_number %}<a class="whatsapp-float" href="https://wa.me/{{ whatsapp_number }}?text=Hello%2C%20I%20would%20like%20help%20choosing%20an%20artwork." target="_blank" rel="noopener" aria-label="Chat with the gallery on WhatsApp" title="Chat with the gallery on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 11.7a8.2 8.2 0 0 1-12.1 7.2L4 20l1.1-3.9a8.2 8.2 0 1 1 15.1-4.4Z"></path><path d="M9 8.3c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l.7 1.6c.1.3.1.5-.1.7l-.5.6c-.2.2-.2.4 0 .6.5.8 1.2 1.4 2 1.8.2.1.4.1.6-.1l.7-.8c.2-.2.4-.3.7-.2l1.5.7c.3.1.4.3.4.5 0 .4-.2 1-.6 1.3-.4.4-1 .6-1.6.5-1-.1-2.1-.6-3.2-1.5-1-.8-1.8-1.8-2.2-2.8-.4-.9-.4-1.7-.1-2.3Z"></path></svg></a>{% endif %}
   <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js" defer></script>
   <script src="{% static 'gallery/js/storefront.js' %}" defer></script>

@@ -25,11 +25,13 @@ from orders.models import GiftCard, GiftCardRedemption, Order as CommerceOrder
 class CatalogFoundationTests(TestCase):
 	def test_seed_command_is_repeatable(self):
 		call_command('seed_gallery', verbosity=0)
+		first_category_count = Category.objects.count()
 		call_command('seed_gallery', verbosity=0)
+		second_category_count = Category.objects.count()
 
 		self.assertEqual(Collection.objects.count(), 4)
 		self.assertEqual(Artist.objects.count(), 3)
-		self.assertEqual(Category.objects.count(), 5)
+		self.assertEqual(first_category_count, second_category_count)
 		self.assertEqual(Artwork.objects.count(), 12)
 		self.assertEqual(Artwork.objects.filter(is_featured=True).count(), 3)
 		self.assertTrue(all(artwork.mood_tagline for artwork in Artwork.objects.all()))

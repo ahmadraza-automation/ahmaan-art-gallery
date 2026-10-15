@@ -81,13 +81,36 @@ def _breadcrumb_schema(items):
 
 
 def support_page(request, page_name, title, intro, body=''):
+	site_settings = SiteSettings.objects.first()
+	policy_fields = {
+		'shipping': 'shipping_policy',
+		'returns': 'returns_policy',
+		'privacy': 'privacy_policy',
+		'terms': 'terms_conditions',
+	}
+	policy_field = policy_fields.get(page_name)
+	if site_settings and policy_field and getattr(site_settings, policy_field):
+		body = getattr(site_settings, policy_field)
+	if page_name == 'faq' and site_settings and site_settings.faq_intro:
+		intro = site_settings.faq_intro
 	context = {
 		'page_title': title,
 		'intro': intro,
+		'site_settings': site_settings,
 		'seo_title': f'{title} | Ahmaan Art Gallery Pakistan',
 		'seo_description': intro,
 		'breadcrumb_jsonld': _breadcrumb_schema((('Home', '/'), (title, request.path))),
 	}
+	if page_name == 'returns' and site_settings:
+		context['extra_policy_sections'] = [
+			{'title': heading, 'text': getattr(site_settings, field_name)}
+			for field_name, heading in (
+				('cancellation_policy', 'Cancellations'),
+				('damage_in_transit_policy', 'Damage in transit'),
+				('authenticity_policy', 'Authenticity'),
+			)
+			if getattr(site_settings, field_name)
+		]
 	if page_name == 'faq':
 		items = list(FAQ.objects.filter(is_published=True).order_by('category', 'order', 'pk'))
 		context.update({
@@ -170,10 +193,11 @@ def for_designers(request):
 def shipping_payments(request):
 	content = ShippingPaymentContent.objects.first() or ShippingPaymentContent()
 	cities = CityDeliveryTime.objects.filter(is_active=True)
+	site_settings = SiteSettings.objects.first()
 	return render(request, 'gallery/shipping_payments.html', {
 		'content': content,
 		'cities': cities,
-		'site_settings': SiteSettings.objects.first(),
+		'site_settings': site_settings,
 		'seo_title': 'Shipping & Payments Across Pakistan | Ahmaan Art Gallery',
 		'seo_description': 'Read about artwork delivery across Pakistan, cash on delivery, bank transfer, JazzCash, Easypaisa, and city delivery estimates.',
 		'breadcrumb_jsonld': _breadcrumb_schema((('Home', '/'), ('Shipping & Payments', '/shipping-payments/'))),
@@ -181,10 +205,15 @@ def shipping_payments(request):
 
 
 def cookie_policy(request):
+	site_settings = SiteSettings.objects.first()
+	body = 'Essential cookies support core functions such as the shopping bag, account sessions, and security. Optional advertising cookies may be used to display relevant advertising only after consent. Use Cookie settings in the site footer to change your choice; the preference is stored in this browser.'
+	if site_settings and site_settings.cookie_policy:
+		body = site_settings.cookie_policy
 	return render(request, 'gallery/content_page.html', {
 		'page_title': 'Cookie Policy',
 		'intro': 'We use essential cookies to keep the gallery working and optional cookies only with your consent.',
-		'body': 'Essential cookies support core functions such as the shopping bag, account sessions, and security. Optional advertising cookies may be used to display relevant advertising only after consent. Use Cookie settings in the site footer to change your choice; the preference is stored in this browser.',
+		'body': body,
+		'site_settings': site_settings,
 		'seo_title': 'Cookie Policy | Ahmaan Art Gallery Pakistan',
 		'seo_description': 'Learn how Ahmaan Art Gallery uses essential and optional cookies and how to manage your consent.',
 		'breadcrumb_jsonld': _breadcrumb_schema((('Home', '/'), ('Cookie Policy', '/cookie-policy/'))),

@@ -41,8 +41,8 @@ class ArtistAdmin(ExportModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(ExportModelAdmin):
-	list_display = ('name', 'slug', 'order', 'is_active')
-	list_filter = ('is_active',)
+	list_display = ('name', 'group', 'slug', 'order', 'is_active')
+	list_filter = ('group', 'is_active')
 	search_fields = ('name', 'slug', 'description')
 	prepopulated_fields = {'slug': ('name',)}
 

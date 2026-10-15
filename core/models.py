@@ -9,6 +9,35 @@ from core.images import optimize_uploaded_image
 class SiteSettings(models.Model):
 	announcement_bar_text = models.CharField(max_length=240, blank=True)
 	announcement_bar_enabled = models.BooleanField(default=True)
+	gallery_name = models.CharField(max_length=120, blank=True)
+	tagline = models.CharField(max_length=240, blank=True)
+	logo = models.ImageField(upload_to='site-logo/', blank=True)
+	about_description = models.TextField(blank=True)
+	mission_text = models.TextField(blank=True)
+	process_text = models.TextField(blank=True)
+	promise_text = models.TextField(blank=True)
+	shipping_policy = models.TextField(blank=True)
+	returns_policy = models.TextField(blank=True)
+	cancellation_policy = models.TextField(blank=True)
+	damage_in_transit_policy = models.TextField(blank=True)
+	authenticity_policy = models.TextField(blank=True)
+	privacy_policy = models.TextField(blank=True)
+	terms_conditions = models.TextField(blank=True)
+	cookie_policy = models.TextField(blank=True)
+	faq_intro = models.TextField(blank=True)
+	packaging_text = models.TextField(blank=True)
+	shipping_partner = models.CharField(max_length=120, blank=True)
+	delivery_headline = models.CharField(max_length=180, blank=True)
+	delivery_estimate_text = models.TextField(blank=True)
+	cod_description = models.TextField(blank=True)
+	jazzcash_description = models.TextField(blank=True)
+	easypaisa_description = models.TextField(blank=True)
+	home_price_section_title = models.CharField(max_length=180, blank=True)
+	home_accessories_title = models.CharField(max_length=180, blank=True)
+	home_accessories_text = models.TextField(blank=True)
+	commission_minimum_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
+	commission_completion_time = models.CharField(max_length=120, blank=True)
+	commission_advance_percent = models.PositiveSmallIntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
 	homepage_artists_count = models.PositiveIntegerField(default=0)
 	homepage_artworks_count = models.PositiveIntegerField(default=0)
 	homepage_cities_delivered_count = models.PositiveIntegerField(default=0)
@@ -22,10 +51,19 @@ class SiteSettings(models.Model):
 	whatsapp_number = models.CharField(max_length=32, blank=True)
 	address = models.TextField(blank=True)
 	opening_hours = models.CharField(max_length=240, blank=True)
+	footer_email = models.EmailField(blank=True)
+	phone = models.CharField(max_length=32, blank=True)
+	google_maps_url = models.URLField(blank=True)
 	instagram_url = models.URLField(blank=True)
 	facebook_url = models.URLField(blank=True)
 	pinterest_url = models.URLField(blank=True)
+	youtube_url = models.URLField(blank=True)
+	tiktok_url = models.URLField(blank=True)
 	other_social_links = models.JSONField(default=dict, blank=True)
+	contact_location = models.CharField(max_length=240, blank=True)
+	contact_hours = models.CharField(max_length=240, blank=True)
+	contact_intro = models.TextField(blank=True)
+	support_reply_hours = models.CharField(max_length=240, blank=True)
 	minimum_delivery_days = models.PositiveSmallIntegerField(default=3)
 	maximum_delivery_days = models.PositiveSmallIntegerField(default=7)
 	bank_name = models.CharField(max_length=120, blank=True)
@@ -37,7 +75,13 @@ class SiteSettings(models.Model):
 	easypaisa_account_title = models.CharField(max_length=140, blank=True)
 	easypaisa_number = models.CharField(max_length=40, blank=True)
 	minimum_offer_percent = models.PositiveSmallIntegerField(default=70, validators=[MinValueValidator(1), MaxValueValidator(100)])
+	offer_tab_label = models.CharField(max_length=80, blank=True)
+	offer_dialog_heading = models.CharField(max_length=120, blank=True)
 	payment_instructions = models.TextField(blank=True)
+	newsletter_sender_name = models.CharField(max_length=120, blank=True)
+	newsletter_sender_email = models.EmailField(blank=True)
+	footer_newsletter_heading = models.CharField(max_length=120, blank=True)
+	footer_newsletter_text = models.CharField(max_length=240, blank=True)
 	updated_at = models.DateTimeField(auto_now=True)
 
 	class Meta:
@@ -46,6 +90,13 @@ class SiteSettings(models.Model):
 
 	def __str__(self):
 		return 'Site settings'
+
+	def get_newsletter_sender(self):
+		name = self.newsletter_sender_name.strip() if self.newsletter_sender_name else ''
+		email = self.newsletter_sender_email.strip() if self.newsletter_sender_email else ''
+		if name and email:
+			return name, email
+		return 'Ahmaan Art Gallery', 'hello@ahmaanartgallery.pk'
 
 
 class HeroSlide(models.Model):

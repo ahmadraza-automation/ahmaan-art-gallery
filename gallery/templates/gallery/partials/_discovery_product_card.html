@@ -9,7 +9,7 @@
     {% if artwork.status == 'available' %}{% if has_product_options %}<a class="discovery-cart-action" href="{% url 'gallery:artwork_detail' artwork.slug %}" aria-label="Choose options for {{ artwork.title }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg></a>{% else %}<form class="discovery-cart-form" method="post" action="{% url 'gallery:catalog_add' artwork.slug %}">{% csrf_token %}<button class="discovery-cart-action" type="submit" aria-label="Add {{ artwork.title }} to your bag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg></button></form>{% endif %}{% endif %}
   </div>
   <div class="discovery-product-info">
-    <div class="discovery-product-heading"><div><h3><a href="{% url 'gallery:artwork_detail' artwork.slug %}">{{ artwork.title }}</a></h3><p><a href="{% url 'gallery:artist_detail' artwork.artist.slug %}">{{ artwork.artist.name }}</a></p></div><strong>PKR {{ artwork.base_price|floatformat:0 }}</strong></div>
-    <p class="discovery-product-details">{{ artwork.medium }}{% if artwork.width and artwork.height %}<span>{{ artwork.width|floatformat:0 }} × {{ artwork.height|floatformat:0 }} cm</span>{% endif %}</p>
+    <div class="discovery-product-heading"><div><h3><a href="{% url 'gallery:artwork_detail' artwork.slug %}">{{ artwork.title }}</a></h3>{% if artwork.category.group != 'accessories' %}<p><a href="{% url 'gallery:artist_detail' artwork.artist.slug %}">{{ artwork.artist.name }}</a></p>{% endif %}</div><strong>PKR {{ artwork.base_price|floatformat:0 }}</strong></div>
+    <p class="discovery-product-details">{% if artwork.category.group == 'accessories' %}Material{% else %}{{ artwork.medium }}{% endif %}{% if artwork.width and artwork.height %}<span>{{ artwork.width|floatformat:0 }} × {{ artwork.height|floatformat:0 }} cm</span>{% endif %}</p>
   </div>
 </article>

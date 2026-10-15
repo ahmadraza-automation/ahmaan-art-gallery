@@ -6,6 +6,7 @@
     <p class="eyebrow"><span class="eyebrow-dot"></span> Made around your idea</p>
     <h1>Art with<br><em>your story in it.</em></h1>
     <p>Tell us what you have in mind. Request a custom portrait, a new artwork, or thoughtful changes to a piece in the collection. We will contact you to confirm the details and price.</p>
+    {% if site_settings.commission_minimum_price != None or site_settings.commission_completion_time or site_settings.commission_advance_percent != None %}<div class="commission-note">{% if site_settings.commission_minimum_price != None %}<p>Minimum price: PKR {{ site_settings.commission_minimum_price|floatformat:0 }}</p>{% endif %}{% if site_settings.commission_completion_time %}<p>Completion time: {{ site_settings.commission_completion_time }}</p>{% endif %}{% if site_settings.commission_advance_percent != None %}<p>Advance: {{ site_settings.commission_advance_percent }}%</p>{% endif %}</div>{% endif %}
     <p class="commission-note">Choose a size and frame, describe your additions, and attach a reference image if you have one.</p>
   </aside>
   <form class="contact-form" method="post" enctype="multipart/form-data">

@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django import forms
+from django.db import models
 
 from core.admin_utils import ExportModelAdmin, SingletonModelAdmin
 from .models import (
@@ -17,9 +19,62 @@ class HeroSlideVideoInline(admin.StackedInline):
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(SingletonModelAdmin):
-	list_display = ('announcement_bar_text', 'whatsapp_number', 'updated_at')
-	search_fields = ('announcement_bar_text', 'address', 'whatsapp_number')
+	list_display = ('gallery_name', 'whatsapp_number', 'updated_at')
+	search_fields = ('gallery_name', 'announcement_bar_text', 'address', 'whatsapp_number')
 	readonly_fields = ('updated_at',)
+	formfield_overrides = {
+		models.TextField: {'widget': forms.Textarea(attrs={'rows': 4})},
+	}
+	fieldsets = (
+		('Gallery identity', {
+			'fields': ('gallery_name', 'tagline', 'logo', 'announcement_bar_text', 'announcement_bar_enabled'),
+			'help_text': 'Set the gallery name, tagline, logo, and announcement bar.'
+		}),
+		('Contact', {
+			'fields': ('phone', 'whatsapp_number', 'address', 'opening_hours', 'contact_location', 'contact_hours', 'contact_intro', 'support_reply_hours', 'google_maps_url'),
+			'help_text': 'Set contact details and the contact page information.'
+		}),
+		('Social links', {
+			'fields': ('instagram_url', 'facebook_url', 'pinterest_url', 'youtube_url', 'tiktok_url', 'other_social_links'),
+			'help_text': 'Add social media links shown in the site footer.'
+		}),
+		('Offer tab', {
+			'fields': ('offer_tab_label', 'offer_dialog_heading'),
+			'help_text': 'Change the newsletter offer tab and dialog heading.'
+		}),
+		('Newsletter and support', {
+			'fields': ('newsletter_sender_name', 'newsletter_sender_email', 'footer_newsletter_heading', 'footer_newsletter_text', 'footer_email'),
+			'help_text': 'Set the newsletter sender and support reply information.'
+		}),
+		('Shipping and payment', {
+			'fields': ('flat_shipping_rate', 'free_shipping_threshold', 'minimum_delivery_days', 'maximum_delivery_days', 'payment_badge_cod', 'payment_badge_bank_transfer', 'payment_badge_jazzcash', 'payment_badge_easypaisa', 'bank_name', 'bank_account_title', 'bank_account_number', 'bank_iban', 'jazzcash_account_title', 'jazzcash_number', 'easypaisa_account_title', 'easypaisa_number', 'minimum_offer_percent', 'payment_instructions'),
+			'help_text': 'Manage shipping, payments, and offer limits.'
+		}),
+		('About page', {
+			'fields': ('about_description', 'mission_text', 'process_text', 'promise_text'),
+			'help_text': 'Edit the gallery story and about-page sections.'
+		}),
+		('Policies', {
+			'fields': ('shipping_policy', 'returns_policy', 'cancellation_policy', 'damage_in_transit_policy', 'authenticity_policy', 'privacy_policy', 'terms_conditions', 'cookie_policy', 'faq_intro'),
+			'help_text': 'Edit the copy shown on policy and FAQ pages.'
+		}),
+		('Shipping and delivery', {
+			'fields': ('packaging_text', 'shipping_partner', 'delivery_headline', 'delivery_estimate_text'),
+			'help_text': 'Set packaging, carrier, and delivery information.'
+		}),
+		('Payments', {
+			'fields': ('cod_description', 'jazzcash_description', 'easypaisa_description'),
+			'help_text': 'Describe the available payment methods.'
+		}),
+		('Homepage text', {
+			'fields': ('home_price_section_title', 'home_accessories_title', 'home_accessories_text'),
+			'help_text': 'Edit headings and copy shown on the homepage.'
+		}),
+		('Commission service', {
+			'fields': ('commission_minimum_price', 'commission_completion_time', 'commission_advance_percent'),
+			'help_text': 'Set optional price, timing, and advance details.'
+		}),
+	)
 
 
 @admin.register(HeroSlide)

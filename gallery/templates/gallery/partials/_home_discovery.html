@@ -20,8 +20,22 @@
 
 {% if price_ranges %}
 <section class="price-discovery-section" aria-labelledby="price-discovery-title">
-  <div class="editorial-section-heading"><div><p class="eyebrow">A thoughtful place to begin</p><h2 id="price-discovery-title">Shop by Price</h2></div></div>
+  <div class="editorial-section-heading"><div><p class="eyebrow">A thoughtful place to begin</p><h2 id="price-discovery-title">{% firstof site_settings.home_price_section_title 'Shop by Price' %}</h2></div></div>
   <nav class="price-range-list" aria-label="Shop artworks by price range">{% for price_range in price_ranges %}<a class="price-range-link" href="{% url 'gallery:shop' %}?min_price={{ price_range.minimum_price|floatformat:0 }}{% if price_range.maximum_price is not None %}&amp;max_price={{ price_range.maximum_price|floatformat:0 }}{% endif %}">{{ price_range.label }} <span aria-hidden="true">↗</span></a>{% endfor %}</nav>
+</section>
+{% endif %}
+
+{% if accessory_categories %}
+<section class="room-discovery-section" aria-labelledby="accessory-discovery-title">
+  <div class="editorial-section-heading"><div><p class="eyebrow">Thoughtful pieces for everyday living</p><h2 id="accessory-discovery-title">{% firstof site_settings.home_accessories_title 'Shop Home Accessories' %}</h2></div><a class="editorial-text-link" href="{% url 'gallery:shop' %}?group=accessories">Browse all accessories <span aria-hidden="true">↗</span></a></div>
+  <div class="room-discovery-grid">{% for category in accessory_categories %}
+    <article class="room-discovery-card">
+      <a class="room-discovery-image" href="{% url 'gallery:shop' %}?category={{ category.slug }}" aria-label="Explore {{ category.name }}">
+        <span class="room-image-placeholder room-image-placeholder--{{ category.slug|default:'accessories' }}" role="img" aria-label="{{ category.name }} home accessory"></span>
+      </a>
+      <div class="room-discovery-copy"><h3>{{ category.name }}</h3><p>{% firstof site_settings.home_accessories_text 'Discover considered pieces for your home.' %}</p><a class="room-outline-link" href="{% url 'gallery:shop' %}?category={{ category.slug }}">Shop {{ category.name }}</a></div>
+    </article>
+  {% endfor %}</div>
 </section>
 {% endif %}
 

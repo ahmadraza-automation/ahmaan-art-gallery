@@ -348,7 +348,7 @@ def commission(request):
         order.save()
         request.session['gallery_order_id'] = order.pk
         return redirect('gallery:order_complete', order_id=order.pk)
-    return render(request, 'gallery/commission.html', {'form': form})
+    return render(request, 'gallery/commission.html', {'form': form, 'site_settings': SiteSettings.objects.first()})
 
 
 def order_complete(request, order_id):
@@ -375,7 +375,10 @@ def order_complete(request, order_id):
 
 
 def about(request):
-    return render(request, 'gallery/about.html', {'artist_profile': GalleryProfile.objects.first()})
+    return render(request, 'gallery/about.html', {
+        'artist_profile': GalleryProfile.objects.first(),
+        'site_settings': SiteSettings.objects.first(),
+    })
 
 
 @rate_limit(5, period=300)

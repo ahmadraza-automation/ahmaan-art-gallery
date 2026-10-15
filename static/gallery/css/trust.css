@@ -63,6 +63,12 @@
 .faq-answer { padding: 0 38px 16px 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
 .faq-answer p { margin: 0; }
 
+@media (min-width: 761px) and (max-width: 980px) {
+  .trust-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trust-feature:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); }
+  .trust-feature:nth-child(4) { border-top: 1px solid var(--line); }
+}
+
 @media (max-width: 760px) {
   .story-section--managed .story-copy { padding: 26px 22px; }
   .press-strip { margin-top: 72px; padding-inline: 6%; }
@@ -171,8 +177,8 @@
 
 .catalog-compare-form { position: absolute; z-index: 4; top: 55px; right: 10px; }
 .legacy-art-card { position: relative; }
-.compare-toggle { display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: #fffefaed; color: var(--ink); cursor: pointer; }
-.compare-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.compare-toggle { display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: #fffefaed; color: #24372e; cursor: pointer; }
+.compare-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
 .compare-toggle[aria-pressed="true"] { border-color: var(--gold-dark); background: var(--gold-dark); color: white; }
 .compare-count { position: absolute; top: 1px; right: 1px; display: grid; min-width: 15px; height: 15px; place-items: center; border-radius: 50%; background: var(--coral); color: white; font-size: 8px; }
 .editorial-header-actions .bag-count, .editorial-header-actions .wishlist-count, .editorial-header-actions .compare-count { position: absolute; top: -4px; right: -5px; display: grid; min-width: 19px; height: 19px; place-items: center; padding: 0 4px; border: 1px solid var(--paper); border-radius: 50%; background: #294638; color: #fff; font-size: 9px; font-weight: 700; line-height: 1; }
@@ -203,7 +209,7 @@
   .compare-table th, .compare-table td { padding: 14px 10px; }
 }
 
-.discount-tab { position: fixed; z-index: 80; top: 44%; right: 0; display: grid; min-width: 42px; min-height: 150px; place-items: center; padding: 12px 9px; border: 1px solid var(--line); border-right: 0; background: #6d4f26; color: white; font: 600 10px var(--sans); writing-mode: vertical-rl; transform: rotate(180deg); cursor: pointer; }
+.discount-tab { position: fixed; z-index: 80; top: 44%; right: 0; display: grid; min-width: 44px; min-height: 150px; place-items: center; padding: 14px 10px; border: 1px solid var(--line); border-right: 0; background: #6d4f26; color: white; font: 600 14px var(--sans); letter-spacing: .02em; writing-mode: vertical-rl; transform: rotate(180deg); cursor: pointer; }
 .commerce-payment-page .discount-tab, .commerce-payment-page .discount-offer-dialog, body:has(#cart-panel[open]) .discount-tab { display: none; }
 .whatsapp-float { position: fixed; z-index: 90; right: 18px; bottom: 20px; display: grid; width: 48px; height: 48px; place-items: center; border: 2px solid #fff; border-radius: 50%; background: #147a55; color: white; box-shadow: 0 4px 18px #14211b55; transition: transform .2s ease, background .2s ease; }
 .whatsapp-float:hover { transform: translateY(-2px); background: #0f6546; }
@@ -347,7 +353,7 @@ html[data-theme="dark"] .summary-grand-total { border-top-color: var(--line); }
 }
 
 @media (max-width: 479px) {
-  .discount-tab { min-width: 28px; min-height: 92px; padding: 8px 5px; font-size: 8px; }
+  .discount-tab { min-width: 44px; min-height: 120px; padding: 12px 10px; font-size: 14px; }
 }
 
 @media (max-width: 430px) {

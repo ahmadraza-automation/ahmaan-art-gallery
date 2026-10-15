@@ -104,6 +104,191 @@
   letter-spacing: 0;
 }
 
+:root {
+  --site-container-max: 1320px;
+  --site-container-gutter: clamp(16px, 6.5%, 86px);
+  --site-container-edge: max(16px, calc(max(0px, (100vw - 1320px) / 2) + min(6.5vw, 86px)));
+}
+
+.site-header,
+.announcement-strip {
+  padding-inline: var(--site-container-edge);
+}
+
+.main-nav {
+  padding-inline: var(--site-container-edge);
+}
+
+.mega-menu {
+  padding-inline: var(--site-container-edge);
+}
+
+.hero-copy {
+  left: var(--site-container-edge);
+}
+
+.hero-controls {
+  right: var(--site-container-edge);
+}
+
+.trust-strip,
+.home-stats-strip,
+.press-strip,
+.collections-section,
+.discovery-band,
+.unboxing-section,
+.manifesto-section,
+.artist-spotlight,
+.homepage-newsletter,
+.visit-band {
+  padding-inline: var(--site-container-edge);
+}
+
+.trust-strip > div:first-child {
+  padding-left: 0;
+}
+
+.trust-strip > div:last-child {
+  padding-right: 0;
+}
+
+.editorial-section,
+.instagram-section,
+.journal-section,
+.editorial-browse-section,
+.palette-section,
+.story-section,
+.trust-features-section,
+.collector-reviews-section,
+.room-discovery-section,
+.price-discovery-section,
+.discovery-carousel-section,
+.room-listing-page,
+.new-arrivals-page,
+.compare-page,
+.browse-page,
+.collection-detail-page,
+.artist-profile-page,
+.bundle-detail-page,
+.catalog-product-page,
+.shop-page,
+.art-match-page,
+.gift-card-page,
+.designers-page,
+.shipping-payments-page,
+.artists-page,
+.content-page,
+.detail-page,
+.contact-page,
+.about-page,
+.checkout-page,
+.profile-page,
+.intro,
+.featured,
+.collection,
+.confirmation-page,
+.auth-page,
+.faq-page,
+.account-address-page,
+.testimonial-section {
+  max-width: var(--site-container-max);
+  margin-inline: auto;
+  padding-inline: var(--site-container-gutter);
+}
+
+.footer-main,
+.footer-bottom {
+  max-width: var(--site-container-max);
+  margin-inline: auto;
+  padding-inline: var(--site-container-gutter);
+}
+
+.auth-page > .eyebrow,
+.auth-page > h1,
+.auth-page > .contact-form,
+.auth-page > .auth-switch {
+  max-width: 430px;
+}
+
+.confirmation-page > * {
+  max-width: 650px;
+}
+
+.testimonial-slide > p {
+  max-width: 900px;
+}
+
+#main-content,
+#main-content > * {
+  min-width: 0;
+}
+
+#main-content img,
+#main-content video,
+#main-content iframe {
+  max-width: 100%;
+}
+
+.payment-method-logos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-bottom: 26px;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.payment-logo {
+  display: grid;
+  min-width: 0;
+  min-height: 64px;
+  align-content: center;
+  justify-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: center;
+}
+
+.payment-logo b {
+  font-size: 11px;
+}
+
+.payment-logo small {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+@media (max-width: 760px) {
+  .payment-method-logos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  .payment-logo {
+    min-height: 58px;
+    padding-inline: 5px;
+  }
+}
+
+@media (max-width: 980px) {
+  .mega-menu {
+    padding-inline: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .trust-strip > div:first-child {
+    padding-left: 0;
+  }
+
+  .trust-strip > div:last-child {
+    padding-right: 0;
+  }
+}
+
 @media (max-width: 760px) {
   .home-order-guide {
     padding-top: 58px;

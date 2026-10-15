@@ -33,13 +33,20 @@ def generate_order_certificate(order):
 	page.drawString(54, 610, 'Original works in this order')
 	page.setFont('Helvetica', 11)
 	y = 583
-	for item in order.items.select_related('artwork', 'artwork__artist'):
+	painting_items = []
+	for item in order.items.select_related('artwork', 'artwork__artist', 'artwork__category'):
+		if item.artwork and item.artwork.category_id and item.artwork.category.group == 'accessories':
+			continue
+		painting_items.append(item)
+	for item in painting_items:
 		artist_name = item.artwork.artist.name if item.artwork else 'Ahmaan Art Gallery'
 		page.drawString(64, y, f'{item.title_at_order}  |  {artist_name}')
 		y -= 20
 		if y < 150:
 			page.showPage()
 			y = 770
+	if not painting_items:
+		return None
 	page.setFont('Helvetica', 9)
 	page.setFillColorRGB(.35, .38, .35)
 	page.drawString(54, 105, 'This certificate verifies the original artwork listed above as supplied by Ahmaan Art Gallery.')

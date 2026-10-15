@@ -1,6 +1,7 @@
 from datetime import timedelta
 from decimal import Decimal
 from urllib.parse import quote
+from uuid import UUID
 
 from django.conf import settings
 from django.contrib import messages
@@ -16,7 +17,7 @@ from django.views.decorators.http import require_POST
 from accounts.models import AccountProfile, SavedAddress
 from catalog.models import Artwork, CanvasType, FrameOption, SizeOption
 from core.models import SiteSettings
-from core.security import rate_limit
+from core.security import auth_attempt_limit, rate_limit
 from gallery.models import Artwork as LegacyArtwork
 from gallery.pricing import artwork_price
 from orders.certificates import generate_order_certificate
@@ -266,7 +267,7 @@ def _create_order(request, form, rows, site_settings, coupon, gift_card=None):
 			request.session['catalog_cart'] = []
 			request.session['gallery_cart'] = []
 			request.session['orders_last_reference'] = order.reference
-			generate_order_certificate(order)
+			certificate = generate_order_certificate(order)
 	except CartUnavailable as error:
 		messages.error(request, str(error))
 		return redirect('gallery:shop')
@@ -281,8 +282,12 @@ def _create_order(request, form, rows, site_settings, coupon, gift_card=None):
 	))
 	phone_number = ''.join(character for character in ((site_settings.whatsapp_number or settings.WHATSAPP_NUMBER)) if character.isdigit())
 	whatsapp_url = f'https://wa.me/{phone_number}?text={quote(message)}' if phone_number else f'https://wa.me/?text={quote(message)}'
-	certificate_url = f'{settings.PUBLIC_SITE_URL.rstrip("/")}{reverse("orders:verify_certificate", args=[order.certificate_id])}'
-	email_body = f"Thank you for your order {order.reference}.\n\n{items_text}\n\nSubtotal: PKR {subtotal:,.0f}\nShipping: PKR {shipping:,.0f}\nDiscount: PKR {discount:,.0f}\nTotal: PKR {total:,.0f}\n\nTrack your order at {settings.PUBLIC_SITE_URL.rstrip('/')}{reverse('orders:track')}\nYour certificate will be available at {certificate_url}"
+	certificate_url = None
+	if certificate is not None:
+		certificate_url = f'{settings.PUBLIC_SITE_URL.rstrip("/")}{reverse("orders:verify_certificate", args=[order.certificate_id])}'
+		email_body = f"Thank you for your order {order.reference}.\n\n{items_text}\n\nSubtotal: PKR {subtotal:,.0f}\nShipping: PKR {shipping:,.0f}\nDiscount: PKR {discount:,.0f}\nTotal: PKR {total:,.0f}\n\nTrack your order at {settings.PUBLIC_SITE_URL.rstrip('/')}{reverse('orders:track')}\nYour certificate will be available at {certificate_url}"
+	else:
+		email_body = f"Thank you for your order {order.reference}.\n\n{items_text}\n\nSubtotal: PKR {subtotal:,.0f}\nShipping: PKR {shipping:,.0f}\nDiscount: PKR {discount:,.0f}\nTotal: PKR {total:,.0f}\n\nTrack your order at {settings.PUBLIC_SITE_URL.rstrip('/')}{reverse('orders:track')}"
 	send_mail('Your Ahmaan Art Gallery order', email_body, settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'orders@ahmaanartgallery.pk', [order.customer_email], fail_silently=True)
 	return redirect('orders:confirmation', reference=order.reference)
 
@@ -299,12 +304,13 @@ def confirmation(request, reference):
 		'order': order,
 		'items': items,
 		'whatsapp_url': whatsapp_url,
-		'certificate_url': reverse('orders:verify_certificate', args=[order.certificate_id]),
+		'certificate_url': reverse('orders:verify_certificate', args=[order.certificate_id]) if order.certificate_file else None,
 		'seo_title': f'Order {order.reference} Confirmed | Ahmaan Art Gallery',
 		'seo_description': f'Your Ahmaan Art Gallery order {order.reference} has been received. Review your order details and authenticity certificate.',
 	})
 
 
+@auth_attempt_limit(identifier_field='order_id')
 def track_order(request):
 	form = OrderTrackingForm(request.POST or None)
 	order = None
@@ -319,8 +325,24 @@ def track_order(request):
 
 
 def verify_certificate(request, certificate_id):
-	order = get_object_or_404(Order.objects.prefetch_related('items__artwork__artist'), certificate_id=certificate_id)
-	return render(request, 'orders/verify_certificate.html', {'order': order})
+	try:
+		certificate_uuid = UUID(certificate_id)
+	except (TypeError, ValueError, AttributeError):
+		return render(request, 'orders/certificate_not_found.html', status=404)
+	order = Order.objects.filter(certificate_id=certificate_uuid).first()
+	if not order:
+		return render(request, 'orders/certificate_not_found.html', status=404)
+	original_titles = [
+		item.title_at_order
+		for item in order.items.select_related('artwork', 'artwork__category')
+		if not (item.artwork and item.artwork.category_id and item.artwork.category.group == 'accessories')
+	]
+	return render(request, 'orders/verify_certificate.html', {
+		'certificate_id': order.certificate_id,
+		'order_reference': order.reference,
+		'issued_at': order.created_at,
+		'original_titles': original_titles,
+	})
 
 
 def download_certificate(request, certificate_id):

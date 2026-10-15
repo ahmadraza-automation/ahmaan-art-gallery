@@ -22,6 +22,7 @@
   <div class="content-body">
     {{ body|linebreaksbr }}
   </div>
+  {% for section in extra_policy_sections %}<section class="content-body"><h2>{{ section.title }}</h2>{{ section.text|linebreaksbr }}</section>{% endfor %}
   {% endif %}
 </section>
 {% endblock %}

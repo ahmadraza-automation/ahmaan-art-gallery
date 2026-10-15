@@ -21,10 +21,13 @@ from django.urls import include, path
 from django.contrib.sitemaps.views import sitemap
 
 from core.sitemaps import sitemaps
+from core.security import auth_attempt_limit
 from core.views import ads_txt, robots_txt
 
+admin.site.login = auth_attempt_limit(admin.site.login, identifier_field='username', failed_only=True)
+
 urlpatterns = [
-    path(settings.DJANGO_ADMIN_URL, admin.site.urls),
+    path(settings.ADMIN_URL, admin.site.urls),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     path('robots.txt', robots_txt, name='robots_txt'),
     path('ads.txt', ads_txt, name='ads_txt'),

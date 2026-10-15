@@ -37,8 +37,13 @@ class Artist(models.Model):
 
 
 class Category(models.Model):
+	class Group(models.TextChoices):
+		PAINTINGS = 'paintings', 'Paintings'
+		ACCESSORIES = 'accessories', 'Home Accessories'
+
 	name = models.CharField(max_length=100, unique=True)
 	slug = models.SlugField(max_length=110, unique=True, blank=True)
+	group = models.CharField(max_length=20, choices=Group.choices, default=Group.PAINTINGS, db_index=True)
 	description = models.TextField(blank=True)
 	is_active = models.BooleanField(default=True)
 	order = models.PositiveSmallIntegerField(default=0)

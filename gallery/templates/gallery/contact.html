@@ -5,12 +5,14 @@
   <div class="contact-aside">
     <p class="eyebrow">We'd love to hear from you</p>
     <h1>Let's talk<br><em>about art.</em></h1>
-    <p>Ask us about a work, arrange a viewing, or simply start a conversation. We'll get back to you soon.</p>
-    <div class="contact-note"><span class="note-mark" aria-hidden="true">A</span><span>Ahmaan Art Gallery<br><small>Independent art, thoughtfully found</small></span></div>
+    <p>{% firstof site_settings.contact_intro 'Ask us about a work, arrange a viewing, or simply start a conversation. We\'ll get back to you soon.' %}</p>
+    <div class="contact-note"><span class="note-mark" aria-hidden="true">A</span><span>{% firstof site_settings.gallery_name 'Ahmaan Art Gallery' %}<br><small>{% firstof site_settings.tagline 'Independent art, thoughtfully found' %}</small></span></div>
     <div class="contact-meta">
-      <p><strong>Visit</strong><br> Lahore, Pakistan</p>
-      <p><strong>Hours</strong><br> Tue – Sat, 11:00 – 7:00</p>
-      <p><strong>WhatsApp</strong><br><a href="https://wa.me/{{ whatsapp_number|default:'923001234567' }}">Message the gallery</a></p>
+      <p><strong>Visit</strong><br>{% firstof site_settings.contact_location 'Lahore, Pakistan' %}{% if site_settings.google_maps_url %}<br><a href="{{ site_settings.google_maps_url }}" target="_blank" rel="noopener">View on Google Maps</a>{% endif %}</p>
+      <p><strong>Hours</strong><br>{% firstof site_settings.contact_hours 'Tue – Sat, 11:00 – 7:00' %}</p>
+      {% if site_settings.phone %}<p><strong>Phone</strong><br><a href="tel:{{ site_settings.phone }}">{{ site_settings.phone }}</a></p>{% endif %}
+      {% if whatsapp_number %}<p><strong>WhatsApp</strong><br><a href="https://wa.me/{{ whatsapp_number }}">Message the gallery</a></p>{% endif %}
+      <p><strong>Support reply</strong><br>{% firstof site_settings.support_reply_hours 'Monday to Saturday, 10 AM to 8 PM' %}</p>
       <p><strong>Need help?</strong><br><a href="{% url 'core:faq' %}">Read the FAQ</a> or <a href="{% url 'core:shipping' %}">shipping details</a></p>
     </div>
   </div>

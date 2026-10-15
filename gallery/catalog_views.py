@@ -78,6 +78,7 @@ def shop(request):
 	artworks = Artwork.objects.select_related('artist', 'category').prefetch_related('images', 'collections')
 	filter_values = {
 		'category': request.GET.get('category', '').strip(),
+		'group': request.GET.get('group', '').strip(),
 		'collection': request.GET.get('collection', '').strip(),
 		'size': request.GET.get('size', '').strip(),
 		'size_band': request.GET.get('size_band', '').strip(),
@@ -93,6 +94,8 @@ def shop(request):
 	}
 	minimum = _safe_decimal(request.GET.get('min_price', ''))
 	maximum = _safe_decimal(request.GET.get('max_price', ''))
+	if filter_values['group'] in {'paintings', 'accessories'}:
+		artworks = artworks.filter(category__group=filter_values['group'])
 	if filter_values['category']:
 		artworks = artworks.filter(category__slug=filter_values['category'])
 	if filter_values['collection']:
@@ -149,6 +152,7 @@ def shop(request):
 	active_filters = []
 	filter_labels = {
 		'category': ('Category', Category, 'name'),
+		'group': ('Group', None, None),
 		'collection': ('Collection', Collection, 'name'),
 		'artist': ('Artist', Artist, 'name'),
 		'size': ('Size', SizeOption, 'name'),
@@ -194,6 +198,7 @@ def shop(request):
 		'artists': Artist.objects.all(),
 		'size_options': SizeOption.objects.filter(is_active=True),
 		'mediums': Artwork.objects.order_by('medium').values_list('medium', flat=True).distinct(),
+		'accessory_categories': Category.objects.filter(is_active=True, group='accessories').order_by('order', 'name'),
 		'styles': _available_filter_values('style_tags'),
 		'subjects': _available_filter_values('subject_tags'),
 		'colors': _available_filter_values('color_palette_tags'),
@@ -295,6 +300,9 @@ def artwork_detail(request, slug):
 		related_query |= Q(style_tags__icontains=style)
 	for subject in artwork.subject_tags:
 		related_query |= Q(subject_tags__icontains=subject)
+	is_accessory = artwork.category.group == Category.Group.ACCESSORIES
+	if is_accessory:
+		related_query &= Q(category__group=Category.Group.ACCESSORIES)
 	related = Artwork.objects.filter(related_query).exclude(pk=artwork.pk).distinct().select_related('artist', 'category').prefetch_related('images')[:4]
 	recently_viewed = Artwork.objects.filter(pk__in=recent_ids[:4]).select_related('artist', 'category').prefetch_related('images')
 	if request.GET.get('quick') == '1':
@@ -328,16 +336,23 @@ def artwork_detail(request, slug):
 	base_url = settings.PUBLIC_SITE_URL.rstrip('/')
 	product_url = f'{base_url}/artwork/{artwork.slug}/'
 	images = [f'{base_url}{item.image.url}' for item in artwork.images.all() if item.image]
-	seo_description = artwork.meta_description or (
-		f'Buy {artwork.medium} by {artwork.artist.name}. {artwork.mood_tagline} '
-		f'{artwork.story[:140]} Shop original art in Pakistan.'
-	)
+	if is_accessory:
+		seo_title = f'{artwork.title} {artwork.category.name} | Ahmaan Art Gallery'
+		seo_description = f'{artwork.title}, {artwork.category.name}. {artwork.medium}'
+		if artwork.width and artwork.height:
+			seo_description += f'. {artwork.width} × {artwork.height} cm'
+	else:
+		seo_title = artwork.meta_title or f'{artwork.title} Original {artwork.category.name} | Ahmaan Art Gallery'
+		seo_description = artwork.meta_description or (
+			f'Buy {artwork.medium} by {artwork.artist.name}. {artwork.mood_tagline} '
+			f'{artwork.story[:140]} Shop original art in Pakistan.'
+		)
 	availability = 'https://schema.org/InStock' if artwork.status == Artwork.Status.AVAILABLE else 'https://schema.org/OutOfStock'
 	return render(request, 'gallery/catalog_artwork_detail.html', {
 		'artwork': artwork,
 		'wishlist_ids': _wishlist_ids(request),
 		'compare_ids': _compare_ids(request),
-		'seo_title': artwork.meta_title or f'{artwork.title} Original {artwork.category.name} | Ahmaan Art Gallery',
+		'seo_title': seo_title,
 		'seo_description': seo_description,
 		'seo_image': images[0] if images else '',
 		'product_jsonld': schema_json({
