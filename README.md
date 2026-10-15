@@ -83,15 +83,13 @@ Ahmaan Art Gallery is a full-featured Django e-commerce platform specialized for
 ## Screenshots
 
 ### Homepage Hero
-> "Make room for feeling" — bold hero with original artwork background
+![Homepage Hero](docs/screenshots/homepage-hero.jpeg)
 
-### Collections Grid
-> Curated collections: Quiet Landscapes, Letters of Light, Everyday Reverie, Portrait Studies
+### Collections
+![Collections](docs/screenshots/collections.jpeg)
 
 ### How It Works
-> Clear 4-step process: Explore → Order → Secure Payment → Delivery
-
-*(Screenshots available in the project — add them under `docs/screenshots/` for full visual documentation)*
+![How It Works](docs/screenshots/homepage-how-it-works.jpeg)
 
 ---
 
@@ -106,6 +104,8 @@ ahmaan-art-gallery/
 ├── core/              # Site settings, journal, testimonials, FAQs, trust features
 ├── gallery/           # Legacy storefront (still active)
 ├── orders/            # Checkout, payments, certificates, tracking
+├── docs/
+│   └── screenshots/   # Project screenshots
 ├── manage.py
 ├── requirements.txt
 └── .env.example
